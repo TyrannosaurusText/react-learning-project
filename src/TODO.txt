@@ -7,6 +7,7 @@ death and victories
 loot! and much more
 
 durational buffs mechanism
+skill cooldown system
 
 stretch goals:
 lets not start ok.

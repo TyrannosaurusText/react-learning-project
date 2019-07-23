@@ -2,11 +2,11 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./css/index.css";
 import Window from "./js/Window";
-import "./bootstrap/dist/css/bootstrap.css";
+import "./css/bootstrap.css";
 import Battle from "./js/Battle";
 import Player from "./js/Player";
 import {newJobReincarnator} from "./js/globals";
-import Stats from "./js/Stats"
+// import Stats from "./js/Stats"
 import Skills from "./js/Skills";
 // import character from './Combat'
 // import './globals'
@@ -18,11 +18,11 @@ class Game extends React.Component {
   constructor(props) {
     super(props);
 
-    let stats = JSON.parse(JSON.stringify(newJobReincarnator)); //deep clone
+    let stats = newJobReincarnator.copy(); //deep clone
     let skills = Skills.fillSkills("Strike", "Flame Strike", "ATK Up", "ATK Down");
-    stats.name = "Player";
-    stats.equippedSkills = skills;
-    this.player = new Player(new Stats(stats));
+    stats.set("equippedSkills", skills);
+    console.log(stats)
+    this.player = new Player(stats);
 
     // this.player = new Player(status);
     // console.log(Player.getPlayer());

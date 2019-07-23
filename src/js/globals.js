@@ -1,3 +1,5 @@
+import {constNumberContainer} from './numbers'
+import Stats from './Stats'
 export function tupleWord(count) {
   switch (count) {
     case 0:
@@ -11,19 +13,19 @@ export function tupleWord(count) {
       return count + "-tuple ";
   }
 }
-export let newJobReincarnator = {
-  name: null,
-  hp: 100,
+export let newJobReincarnator = new Stats({
+  name: "Player",
+  hp: new constNumberContainer(100),
   level: 1,
-  atk: 10,
-  def: 10,
-  SP: 100,
-  MP: 50,
-  EXP: 0,
-  turns: 1,
+  atk: new constNumberContainer(10),
+  def: new constNumberContainer(10),
+  SP: new constNumberContainer(100),
+  MP: new constNumberContainer(50),
+  EXP: new constNumberContainer(0),
+  turns: new constNumberContainer(1),
   skillLevels: {Strike:1, "Flame Strike":1, "ATK Up":1, "ATK Down":1 },
   isPlayer: true
-};
+});
 
 export function Clamp(val,min,max){
   return Math.max(Math.min(val, max), min);

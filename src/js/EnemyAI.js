@@ -69,7 +69,6 @@ class EnemyAI {
       stats.getval("charge_now") === stats.getval("charge_max") &&
       stats.getval("no_charge_attack") === 0
     ) {
-      console.log("charge attack");
       stats.set("charge_now", 0);
       return this.loop(
         hp_percent,

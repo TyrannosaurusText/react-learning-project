@@ -105,7 +105,7 @@ export let SkillList = {
     cost_mult: 10,
     onUse: (skillLevel=1, user)=>{
       if (user===null) return null;
-      let obj = {buff: new Buff(skillEnum.ATKUP, 4, {"atk":100+.2*skillLevel})}
+      let obj = {buff: new Buff(skillEnum.ATKUP, 4, {"atk":20+.2*skillLevel})}
       return obj;
     }
   },
@@ -121,7 +121,7 @@ export let SkillList = {
     onUse: (skillLevel=1, user)=>{
       if (user===null) return null;
       
-      let obj = {debuff: new Debuff(skillEnum.ATKDOWN, 4, {"atk":100})}
+      let obj = {debuff: new Debuff(skillEnum.ATKDOWN, 4, {"atk":20+.2*skillLevel})}
       return obj
     }
   }

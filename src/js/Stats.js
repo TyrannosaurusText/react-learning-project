@@ -1,9 +1,10 @@
 import Observer from "./Observer";
 import Message from "./Message";
-import { NumberContainer } from "./numbers";
+import { NumberContainer, constNumberContainer } from "./numbers";
 class Stats {
-  constructor(StatusObj) {
+  constructor(StatusObj={}) {
     this.container = StatusObj;
+    this.container["buffContainer"] = {};
   }
   do_damage(target, skill, bonusMult) {
     if (!target instanceof Stats) return;
@@ -113,15 +114,26 @@ class Stats {
   //   for (var key in keys) if (!(key in obj)) return false;
   //   return true;
   // }
-  static copy(stats) {
-    if (!(this instanceof Stats)) return;
-    let c = JSON.parse(JSON.stringify(this.container));
-    return new Stats(c);
+  copy() {
+    let copyStats = new Stats({})
+    Object.keys(this.container).forEach((element)=>{
+      if(this.container[element] instanceof constNumberContainer)
+      {
+        copyStats.set(element, this.container[element].copy())
+      }
+      else{ //will need to change if nested json objects are in container
+        copyStats.set(element, JSON.parse(JSON.stringify(this.container[element])));
+      }
+    });
+    console.log(copyStats);
+
+    return copyStats;
   }
-  setBattleStats() {
+  setBattleStats() {//TODO: probably add equipment effects + multipliers here.
     let vals = ["hp", "atk", "def", "SP", "MP", "turns"];
     vals.forEach(element => {
-      let val = this.get(element);
+      // console.log(this.getval(element));
+      let val = this.getval(element);
       this.set(
         element + "_now",
         val > 0 ? new NumberContainer(val) : new NumberContainer(0)
@@ -130,12 +142,55 @@ class Stats {
         element + "_max",
         val > 0 ? new NumberContainer(val) : new NumberContainer(0)
       );
+      this.set( 
+        element + "_mult", new NumberContainer(1));
     });
     if ("charge" in this.container) {
       this.set("charge_now", new NumberContainer(0));
       this.set("charge_max", new NumberContainer(this.getval("charge")));
       this.set("no_charge_attack", new NumberContainer(0));
     }
+  }
+
+  /** 
+   * key = atk, def, mp, sp etc.
+   * val = number
+   */
+  addBuff(buff, buff_stat, val){
+    let buffContainer = this.get("buffContainer");
+    if(buff.name in buffContainer){
+      //buff already applied, reapply the buff,
+      //if it is better increase the value
+      //if the duration is longer, reset the duration.
+      buff.reapply(this, buff);
+    }
+    else{
+      this.handleBuff(buff_stat, val)
+      buffContainer[buff.name] = buff;
+    }
+
+  }
+
+  removeBuff(buff, key, val)
+  {
+    let buffContainer = this.get("buffContainer");
+    if(buff.name in buffContainer){
+      this.handleBuff(key, -1*val)
+      delete buffContainer[buff.name]
+    }
+    //else do nothing
+  }
+
+  handleBuff(buff_stat, val)
+  {
+    let buff_mult = buff_stat+"_mult";
+    let buff_max = buff_stat+"_max";
+    let buff_now = buff_stat+"_now";      
+    this.plus(buff_mult, val)
+    let new_max_val = this.get(buff_stat).copy().multiplyBy(this.get(buff_mult)).round();
+    let percentChange = (new_max_val).copy().divideBy(this.get(buff_max))
+    this.set(buff_max, new_max_val);
+    this.get(buff_now).multiplyBy(percentChange);
   }
 
   setMobStats(mob, level, rarity, hp, atk, def) {

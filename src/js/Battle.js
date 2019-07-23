@@ -50,7 +50,8 @@ class Battle {
     });
     Observer.subscribe("BattlePlayerTurn", "Battle", () => {
       this.turn = "Player";
-      this.statusPlayer.set("turns_now", this.statusPlayer.get("turns"));
+      console.log("turn changed")
+      this.statusPlayer.set("turns_now", this.statusPlayer.get("turns_max").copy());
       this.add("Player", this.statusPlayer);
       this.sendUpdate();
     });
@@ -159,7 +160,7 @@ class Battle {
     if (result === true) {
       player.decrement("turns_now");
     }
-    if (turns - 1 === 0) {
+    if (turns - 1 <= 0) {
       this.turn = "Enemy";
       Observer.notify("BattleEnemyTurn", true);
     }
@@ -207,7 +208,7 @@ class Battle {
         arr.forEach(key => {
           user.set(arr[0][0], arr[0][1]);
         });
-        console.log(user);
+        // console.log(user);
         Observer.notify(
           "LogAddMessage",
           new Message(user.get("name") + " used " + skillResult.skillName + ".")
@@ -225,6 +226,15 @@ class Battle {
         target = this.statusEnemies; //as of now player is only solo.
       }
       let result = skill.onUse(skillLevel, target);
+      if(skill.target === "All")
+      {
+        //todo
+      }
+      else
+      {
+        result.buff.applyTo(target);
+        Observer.notify("LogAddMessage", new Message(target.get("name")+ " used " + skillName +"."))
+      }
 
     } else if(skill.type === "Debuff")
     {

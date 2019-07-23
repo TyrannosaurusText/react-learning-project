@@ -50,7 +50,6 @@ class Window extends React.Component {
       }
     });
     if ("PlayerTarget" in update) {
-      console.log("update");
     this.updateUIVisibility(update);
     }
     this.setState(update);
@@ -62,7 +61,6 @@ class Window extends React.Component {
     let vis = this.state.enemyUIVisibility;
     let PlayerTarget = this.state.PlayerTarget;
     let Enemies = this.state.Enemies;
-    console.log(newState);
     if ("Enemies" in newState) Enemies = newState.Enemies;
     if ("PlayerTarget" in newState) PlayerTarget = newState.PlayerTarget
     // if (vis != null) {
@@ -71,19 +69,17 @@ class Window extends React.Component {
     //   vis[oldTarget] = Enemies[oldTarget];
     //   delete vis[newTarget];
     // } else {
-    console.log(Enemies)
     vis = {};
     for (var i = 0; i < 5; i++) {
       
       if (i !== parseInt(PlayerTarget) && Enemies[i] != null) {
-        console.log(i, PlayerTarget)
         vis[i] = Enemies[i];
       }
     }
   // }
 
     newState["enemyUIVisibility"] = vis;
-    console.log(vis);
+    // console.log(vis);
   }
 
   useSkill(skillName) {
