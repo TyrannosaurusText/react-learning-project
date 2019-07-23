@@ -217,7 +217,20 @@ class Battle {
       }
     } else if (skill.type === "Buff") {
       //TODO: Add temporary buff mechanism.
-    } else {
+      let target = null;
+      if(skill.target === "self")
+        target = user;
+      else if(skill.target ==="All")
+      {
+        target = this.statusEnemies; //as of now player is only solo.
+      }
+      let result = skill.onUse(skillLevel, target);
+
+    } else if(skill.type === "Debuff")
+    {
+
+    } 
+    else {
       let bonusMult = new NumberContainer(1);
       if ("SP_Cost" in skill) {
         let sp_remaining = new NumberContainer(
