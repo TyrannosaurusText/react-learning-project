@@ -1,0 +1,12 @@
+ability to change skills
+enemy fight back
+Seperate enemy generation & combat
+save player stats for debuffs & soforth
+save and load system
+death and victories
+loot! and much more
+
+durational buffs mechanism
+
+stretch goals:
+lets not start ok.
