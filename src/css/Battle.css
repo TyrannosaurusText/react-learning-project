@@ -5,31 +5,30 @@
   width: 400px;
   height: 190px;
 }
-
-.container .row {
-  flex-wrap: nowrap;
-  background-color: lightcyan;
-  width: 500px;
+.battleinfo{
+  width: 200px;
+  height: 258px;
+}
+.standard-bar{
   height: 50px;
-  /* margin-left: 10px; */
-  border: 1px solid black;
-  border-left: 2px solid black;
-  border-right: 2px solid black;
+  width: 500px;
+
 }
-.container .col {
-  width: 100%;
-  height: 99%;
-  border: hidden;
-  /* flex-shrink: 0; */
+.status-effects-bar{
+  height: 25px;
+  width: 500px;
 }
-.container .skillBox {
+.window-border, .battleinfo, .statwin-skills, .skillBox, .mini-enemy-box{
   background-color: lightcyan;
-  height: 100px;
-  /* margin-left: -15px; */
   border: 1px solid black;
-  border-bottom: 2px solid black;
   border-left: 2px solid black;
   border-right: 2px solid black;
+}
+/* .container .row{
+  flex-wrap: nowrap;
+} */
+.skillBox, .mini-enemy-box {
+  height: 100px;
 }
 .skills .btn {
   margin-right: 1%;
@@ -40,41 +39,31 @@
 }
 
 .statwin-namehp {
-  background-color: lightblue;
-
-  text-align: left;
-  text-indent: 4px;
-
-  margin-top: 3px;
-  margin-left: -12px;
-  /* margin-right: -10px; */
   width: 105%;
-  height: 90%;
-  border: 3px solid black;
+  height: 89%;
 }
-.namehp{
+/* .namehp, .HPBar{
   height: 100%
+} */
+.inner-window, .statwin-lvl-atk-hp, .miniEnemyUI, .statwin-skills, .statwin-namehp{
+  background-color: lightblue;
+  border: 3px solid black;
+  margin-left: -12px;
+  margin-top: 3px;
+  text-indent: 4px;
+  text-overflow: hidden; 
 }
 
 .statwin-lvl-atk-hp {
-  background-color: lightblue;
-
   text-align: left;
-  text-indent: 4px;
-  
   margin-top: 1px;
-  margin-left: -12px;
-  /* margin-right: 10px ; */
   width: 118%;
   height: 95%;
-  border: 3px solid black;
-
-  font: center;
 }
 
 
-.HPBar{
-  height: 100%;
+.HPBar, .namehp{
+  height:100%;
   margin-left: 0px;
   background-color: red;
   /* font-size: 10px; */
@@ -83,17 +72,10 @@
   font-weight: bold;
 }
 .miniEnemyUI{
-  background-color: lightblue;
-
-  text-align: left;
-  text-indent: 4px;
-
-  margin-top: 3px;
-  margin-left: -12px;
+  border: 2px solid black;
   /* margin-right: -10px; */
   width: 105%;
   height: 21%;
-  border: 2px solid black;
 
 }
 .miniHPBar{
@@ -106,33 +88,20 @@
 }
 
 .statwin-skills {
-  background-color: lightblue;
-
-  text-align: left;
-  text-indent: 4px;
-
   margin-top: 2px;
-  margin-left: -12px;
-  /* margin-right: -10px; */
   width: 105%;
   height: 95%;
-  border: 3px solid black;
 }
-
+/* 
 .ActionsLeft , .sp, .mp
 {
   font-size: 20px;
-}
+} */
 
 
-.statwin .skills {
-  margin-top: -5px;
-  height: 10%;
-}
 .charge, .ActionsLeft, .mp, .sp, .level, .attack, .defense{
   display:inline-block;
   font-size: 20px;
-  
 }
 .inline{
   display: inline-block;
@@ -147,3 +116,4 @@
     opacity: 0;
   }
 }
+

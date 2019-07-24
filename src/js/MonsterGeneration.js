@@ -17,7 +17,7 @@ let MonsterList = {
     defScale: new constNumberContainer(0.1),
     type: "normal",
     minRarity: 0,
-    maxRarity: 15,
+    maxRarity: 5,
     turns: new constNumberContainer(1),
     desc: "An Enemy!",
     AI: "Enemy",
@@ -63,7 +63,7 @@ export function MonsterGeneration(name, level, rarity) {
     let def = calc(mob.defScale, mob.def, level, mob.minLevel, r, mob.rarityScale);
     if (mob.maxLevel !== -1) level = Math.max(level, mob.minLevel);
 
-    let rarename = rarityNames[rarity];
+    let rarename = rarityNames[r];
     stats.setMobStats(mob, level, rarename, hp, atk, def);
     return stats;
   }
@@ -73,7 +73,7 @@ function calc(scale, base, level, minlevel, rarity, rarityScale) {
   // console.log(base, Math.pow(1 + scale, level), Math.pow(2, rarity))
   let val = 
     base.copy().multiplyBy(scale.copy().plus(1).toPower(level-minlevel)).multiplyBy(Math.pow(rarityScale, rarity-5)).trunc()
-  // console.log(val)
+  console.log(val.lte(1))
   if(val.lt(1))
   {
     return new NumberContainer(1)

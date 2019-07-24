@@ -40,10 +40,10 @@ export let SkillList = {
     element: "Fire",
     upgrade_type: "SkillPoint",
     cost_mult: 10,
-    onUse: (skillLevel=1, mana_consumed=5)=>
+    onUse: (skillLevel=1, mp_consumed)=>
     {
-      if(mana_consumed==null) mana_consumed=5;
-      return { damageFlat: (1 +(.02*skillLevel))*mana_consumed};
+      let mp = checkMP(mp_consumed, 5);
+      return { damageFlat: (1 +(.02*skillLevel))*mp};
     },
     targets: 1
 
@@ -56,15 +56,14 @@ export let SkillList = {
     element: "Fire",
     upgrade_type: "SkillPoint",
     cost_mult: 50,
-    onUse: (skillLevel=1, mana_consumed=50)=>
+    onUse: (skillLevel=1, mp_consumed)=>
     {
-      if(mana_consumed==null) mana_consumed=50;
+      let mp = checkMP(mp_consumed, 50);
       let min = Math.floor(Math.max(1,skillLevel-10) / 5) + 1;
       let max = Math.max(1,skillLevel-10);
       let rand = getRndmInteger(min, max);
       let word = tupleWord(rand) + skillEnum.FlameStrike;
-      if(mana_consumed==null) mana_consumed=50;
-      return { damageFlat: (1 +(.2*skillLevel))*mana_consumed, hitCount: rand, skillName: word};
+      return { damageFlat: (1 +(.2*skillLevel))*mp, hitCount: rand, skillName: word};
     },
     targets: 1
 
@@ -128,4 +127,11 @@ export let SkillList = {
 
 };
 
+function checkMP(obj, default_cost){
+  if(!obj || !("MP_Spent" in obj))
+  {
+    return default_cost;
+  }
+  return obj["MP_Spent"];
+}
 export default { SkillList };

@@ -28,7 +28,7 @@ export let newJobReincarnator = new Stats({
 });
 
 export function Clamp(val,min,max){
-  return Math.max(Math.min(val, max), min);
+  return Math.min(Math.max(val, min), max);
 }
 
 export function toEng(val)

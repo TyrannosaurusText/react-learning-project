@@ -1,5 +1,5 @@
 import React from "react";
-import "../css/Player.css";
+import "../css/Battle.css";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -63,8 +63,8 @@ export class BattlePlayerUI extends React.Component {
     if (statusSheet)
       return (
         <Container>
-          <Row>
-            <Col>
+          <Row className="standard-bar">
+            <Col className="window-border">
               <NameHP
                 name={statusSheet.getval("name")}
                 hp_now={statusSheet.getval("hp_now")}
@@ -72,7 +72,9 @@ export class BattlePlayerUI extends React.Component {
               />
             </Col>
           </Row>
-          <Row>
+          <Row className="window-border status-effects-bar">
+          </Row>
+          <Row className="window-border">
             <Col>
               <Level level={statusSheet.getval("level")} />
             </Col>
@@ -83,7 +85,7 @@ export class BattlePlayerUI extends React.Component {
               <Defense defense={statusSheet.getval("def_now")} />
             </Col>
           </Row>
-          <Row>
+          <Row className="window-border">
             <Col>
               <SP
                 SP_now={statusSheet.getval("SP_now")}
@@ -101,8 +103,8 @@ export class BattlePlayerUI extends React.Component {
             </Col>
           </Row>
 
-          <Row className="skillBox">
-            <Col>
+          <Row >
+            <Col className="skillBox">
               <div className="statwin-skills">
                 <div className="skills">
                   <div>
@@ -137,8 +139,8 @@ export class BattleEnemyUI extends React.Component {
     if (statusSheet)
       return (
         <Container>
-          <Row>
-            <Col>
+          <Row className="standard-bar">
+            <Col className="window-border">
               <NameHP
                 name={statusSheet.getval("name")}
                 hp_now={statusSheet.getval("hp_now")}
@@ -146,7 +148,9 @@ export class BattleEnemyUI extends React.Component {
               />
             </Col>
           </Row>
-          <Row>
+          <Row className="window-border status-effects-bar">
+          </Row>
+          <Row className="window-border">
             <Col>
               <Level level={statusSheet.getval("level")} />
             </Col>
@@ -157,7 +161,7 @@ export class BattleEnemyUI extends React.Component {
               <Defense defense={statusSheet.getval("def_now")} />
             </Col>
           </Row>
-          <Row>
+          <Row className="window-border">
             <Col>
               <Charge
                 charge_now={statusSheet.getval("charge_now")}
@@ -171,9 +175,9 @@ export class BattleEnemyUI extends React.Component {
               <div />
             </Col>
           </Row>
-          <Row className="skillBox">
+          <Row>
             {enemyUIVisibility ? (
-              <Col>
+              <Col className="mini-enemy-box">
                 {enemyUIVisibility[0] ? (
                   miniEnemyDisplay(enemyUIVisibility[0])
                 ) : (

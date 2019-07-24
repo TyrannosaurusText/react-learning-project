@@ -200,6 +200,28 @@ class Battle {
     //check and consume resources
     let skillLevel = user.getSkillLevel(skillName);
     let skillResult = null;
+
+    
+    let mp_spent = 0;
+    let bonusMult = new NumberContainer(1);
+      if ("SP_Cost" in skill) {
+        let sp_remaining = user.get("SP_now").copy().minus(skill["SP_Cost"])
+
+        bonusMult.multiplyBy(
+          Skills.getSkill(skillEnum.SPMastery).onUse(
+            user.getSkillLevel(skillEnum.SPMastery),
+            sp_remaining
+          )
+        );
+        user.set("SP_now", sp_remaining);
+      }
+      if("MP_Cost" in skill){
+
+        mp_spent = user.get("MP_max").copy().multiplyBy(skill["MP_Cost"]/100).val;
+        user.get("MP_now").minus(mp_spent);
+
+      }
+      //check skill type then use
     if (skill.type === "Passive") return false;
     else if (skill.type === "Recovery") {
       if (skill.target === "self") {
@@ -254,23 +276,10 @@ class Battle {
 
     // } 
     else {
-      let bonusMult = new NumberContainer(1);
-      if ("SP_Cost" in skill) {
-        let sp_remaining = new NumberContainer(
-          Math.max(0, user.getval("SP_now") - skill["SP_Cost"])
-        );
-
-        bonusMult.multiplyBy(
-          Skills.getSkill(skillEnum.SPMastery).onUse(
-            user.getSkillLevel(skillEnum.SPMastery),
-            sp_remaining
-          )
-        );
-        user.set("SP_now", sp_remaining);
-      }
+      
 
       //calculate skill use result
-      skillResult = skill.onUse(skillLevel);
+      skillResult = skill.onUse(skillLevel, {"MP_Spent": mp_spent});
       if (!("damageMult" in skillResult)) {
         skillResult["damageMult"] = 1;
       }

@@ -1,6 +1,6 @@
 import React from "react";
 import "../css/Window.css";
-import "../css/Player.css";
+import "../css/Battle.css";
 // import Button from 'react-bootstrap/Button'
 // import ButtonToolbar from 'react-bootstrap/ButtonToolbar'
 // import Container from "react-bootstrap/Container";
@@ -50,19 +50,17 @@ class Window extends React.Component {
       }
     });
     if ("PlayerTarget" in update) {
-    this.updateUIVisibility(update);
+      this.updateUIVisibility(update);
     }
     this.setState(update);
   }
-
-  
 
   updateUIVisibility(newState) {
     let vis = this.state.enemyUIVisibility;
     let PlayerTarget = this.state.PlayerTarget;
     let Enemies = this.state.Enemies;
     if ("Enemies" in newState) Enemies = newState.Enemies;
-    if ("PlayerTarget" in newState) PlayerTarget = newState.PlayerTarget
+    if ("PlayerTarget" in newState) PlayerTarget = newState.PlayerTarget;
     // if (vis != null) {
     //   let newTarget = newState["PlayerTarget"];
     //   let oldTarget = this.state.PlayerTarget;
@@ -71,12 +69,11 @@ class Window extends React.Component {
     // } else {
     vis = {};
     for (var i = 0; i < 5; i++) {
-      
       if (i !== parseInt(PlayerTarget) && Enemies[i] != null) {
         vis[i] = Enemies[i];
       }
     }
-  // }
+    // }
 
     newState["enemyUIVisibility"] = vis;
     // console.log(vis);
@@ -104,20 +101,25 @@ class Window extends React.Component {
               </Button>
             </div> */}
             {this.state.Battle ? (
-              <div className="pos">
-                <div className="team0">
-                  <BattlePlayerUI
-                    useSkill={i => this.useSkill(i)}
-                    PlayerStats={this.state.Player}
-                  />
-                </div>
-                <div className="team1">
-                  {this.state.Enemies ? (
-                    <BattleEnemyUI
-                      statusSheet={target}
-                      enemyUIVisibility={this.state.enemyUIVisibility}
+              <div>
+                
+                <div className="pos">
+                  <div className="battleinfo">
+                  </div>
+                  <div className="team0">
+                    <BattlePlayerUI
+                      useSkill={i => this.useSkill(i)}
+                      PlayerStats={this.state.Player}
                     />
-                  ) : null}
+                  </div>
+                  <div className="team1">
+                    {this.state.Enemies ? (
+                      <BattleEnemyUI
+                        statusSheet={target}
+                        enemyUIVisibility={this.state.enemyUIVisibility}
+                      />
+                    ) : null}
+                  </div>
                 </div>
               </div>
             ) : null}

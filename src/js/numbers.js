@@ -18,21 +18,21 @@ export class NumberContainer {
   }
   gt(rhs){
     if (rhs instanceof NumberContainer) return this.val > rhs.val
-    return this.val > rhs.val
+    return this.val > rhs
   }
   lte(rhs){
     return !(this.gt(rhs));
   }
   lt(rhs){
     if (rhs instanceof NumberContainer) return this.val < rhs.val
-    return this.val < rhs.val
+    return this.val < rhs
   }
   gte(rhs){
       return !(this.gt(rhs));
   }
   eq(rhs){
     if (rhs instanceof NumberContainer) return this.val === rhs.val
-    return this.val === rhs.val
+    return this.val === rhs
   }
   set(val) {
     if (val instanceof NumberContainer) this.val = val.val;
