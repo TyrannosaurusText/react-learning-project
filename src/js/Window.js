@@ -106,6 +106,7 @@ class Window extends React.Component {
                 
                 <div className="pos">
                   <div className="battleinfo">
+                  current turn: {this.state.turn}
                   </div>
                   <div className="team0">
                     <BattlePlayerUI

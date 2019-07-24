@@ -17,12 +17,18 @@
 .status-effects-bar{
   height: 25px;
   width: 500px;
+  text-indent: 4px;
+  font-size: 14px;
 }
 .window-border, .battleinfo, .statwin-skills, .skillBox, .mini-enemy-box{
   background-color: lightcyan;
   border: 1px solid black;
   border-left: 2px solid black;
   border-right: 2px solid black;
+}
+.text-offset-status{
+  padding-left: 6px;
+  font-weight: bold;
 }
 /* .container .row{
   flex-wrap: nowrap;
@@ -42,10 +48,8 @@
   width: 105%;
   height: 89%;
 }
-/* .namehp, .HPBar{
-  height: 100%
-} */
-.inner-window, .statwin-lvl-atk-hp, .miniEnemyUI, .statwin-skills, .statwin-namehp{
+
+.inner-window, .statwin-three-box, .miniEnemyUI, .statwin-skills, .statwin-namehp{
   background-color: lightblue;
   border: 3px solid black;
   margin-left: -12px;
@@ -54,22 +58,20 @@
   text-overflow: hidden; 
 }
 
-.statwin-lvl-atk-hp {
+.statwin-three-box {
   text-align: left;
   margin-top: 1px;
   width: 118%;
   height: 95%;
 }
-
-
-.HPBar, .namehp{
-  height:100%;
-  margin-left: 0px;
-  background-color: red;
-  /* font-size: 10px; */
+.namehp, .HPBar{
+  height: 99%;
   text-overflow: hidden; 
   white-space: nowrap;
+  background-color: red;
   font-weight: bold;
+  margin-left: 0px;
+  margin-top: .5px;
 }
 .miniEnemyUI{
   border: 2px solid black;
@@ -99,7 +101,7 @@
 } */
 
 
-.charge, .ActionsLeft, .mp, .sp, .level, .attack, .defense{
+.statwin-text, .charge, .ActionsLeft{
   display:inline-block;
   font-size: 20px;
 }

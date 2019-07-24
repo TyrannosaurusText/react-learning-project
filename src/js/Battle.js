@@ -41,7 +41,9 @@ class Battle {
       this.add("Battle", true);
       this.sendUpdate();
     });
-    Observer.subscribe("BattlePlayerDefeated", "Battle", () => {});
+    Observer.subscribe("BattlePlayerDefeated", "Battle", () => {
+      //TODO: holding this off so that testing is easier.
+    });
     Observer.subscribe("BattleEnemyDefeated", "Battle", EnemiesIndex => {
       this.onEnemyDefeated(EnemiesIndex);
     });
@@ -49,13 +51,17 @@ class Battle {
       this.notifyEnemyUseSkill(update["skillName"], update["index"]);
     });
     Observer.subscribe("BattlePlayerTurn", "Battle", () => {
-      Object.keys(this.statusEnemies).forEach((element)=>{
+      Object.keys(this.statusEnemies).forEach(element => {
         this.statusEnemies[element].decrementBuffDurations();
-      })
+      });
       this.turn = "Player";
       // console.log("players turn")
-      this.statusPlayer.set("turns_now", this.statusPlayer.get("turns_max").copy());
+      this.statusPlayer.set(
+        "turns_now",
+        this.statusPlayer.get("turns_max").copy()
+      );
       this.add("Player", this.statusPlayer);
+      this.add("turn", this.turn);
       this.sendUpdate();
     });
   }
@@ -130,6 +136,7 @@ class Battle {
       this.add("Enemies", this.statusEnemies);
       this.add("PlayerTarget", this.playerTarget);
       this.add("Battle", true);
+      this.add("turn", this.turn);
 
       this.EnemyAI = new EnemyPlayer(this.statusEnemies);
       this.sendUpdate();
@@ -141,7 +148,7 @@ class Battle {
       console.log("not a string");
       return;
     }
-    if (skillName === "None") {
+    if (skillName === "None" || this.turn !== "Player") {
       return;
     }
     let player = this.statusPlayer;
@@ -161,12 +168,17 @@ class Battle {
     // console.log(result);
     let turns = player.getval("turns_now");
     if (result === true) {
+      //skill was used
       player.decrement("turns_now");
-    }
-    if (turns - 1 <= 0) {
-      this.turn = "Enemy";
-      player.decrementBuffDurations();
-      Observer.notify("BattleEnemyTurn", true);
+
+      if (turns - 1 <= 0) {
+        //check for turn end
+        this.turn = "Enemy";
+        player.decrementBuffDurations();
+        this.add("turn", this.turn);
+        this.sendUpdate();
+        Observer.notify("BattleEnemyTurn", true);
+      }
     }
   }
   notifyEnemyUseSkill(skillName, enemyIndex) {
@@ -201,27 +213,30 @@ class Battle {
     let skillLevel = user.getSkillLevel(skillName);
     let skillResult = null;
 
-    
     let mp_spent = 0;
     let bonusMult = new NumberContainer(1);
-      if ("SP_Cost" in skill) {
-        let sp_remaining = user.get("SP_now").copy().minus(skill["SP_Cost"])
+    if ("SP_Cost" in skill) {
+      let sp_remaining = user
+        .get("SP_now")
+        .copy()
+        .minus(skill["SP_Cost"]);
 
-        bonusMult.multiplyBy(
-          Skills.getSkill(skillEnum.SPMastery).onUse(
-            user.getSkillLevel(skillEnum.SPMastery),
-            sp_remaining
-          )
-        );
-        user.set("SP_now", sp_remaining);
-      }
-      if("MP_Cost" in skill){
-
-        mp_spent = user.get("MP_max").copy().multiplyBy(skill["MP_Cost"]/100).val;
-        user.get("MP_now").minus(mp_spent);
-
-      }
-      //check skill type then use
+      bonusMult.multiplyBy(
+        Skills.getSkill(skillEnum.SPMastery).onUse(
+          user.getSkillLevel(skillEnum.SPMastery),
+          sp_remaining
+        )
+      );
+      user.set("SP_now", sp_remaining);
+    }
+    if ("MP_Cost" in skill) {
+      mp_spent = user
+        .get("MP_max")
+        .copy()
+        .multiplyBy(skill["MP_Cost"] / 100).val;
+      user.get("MP_now").minus(mp_spent);
+    }
+    //check skill type then use
     if (skill.type === "Passive") return false;
     else if (skill.type === "Recovery") {
       if (skill.target === "self") {
@@ -244,42 +259,35 @@ class Battle {
       }
     } else if (skill.type === "Buff" || skill.type === "Debuff") {
       let effectTarget = null;
-      if(skill.target === "self"){
+      if (skill.target === "self") {
         effectTarget = user;
-      }
-      else if(skill.target === "single")
-      {
+      } else if (skill.target === "single") {
         effectTarget = target;
-      }
-      else if(skill.target ==="All")
-      {
+      } else if (skill.target === "All") {
         effectTarget = this.statusEnemies; //as of now player is only solo.
       }
       let result = skill.onUse(skillLevel, effectTarget);
-      if(skill.target === "All")
-      {
+      if (skill.target === "All") {
         //todo
-      }
-      else
-      {
+      } else {
         result.statusEffect.applyTo(effectTarget);
         let targetMsg = ".";
-        if(skill.target === "single"){
-          targetMsg = " on " + effectTarget.get("name")+".";
+        if (skill.target === "single") {
+          targetMsg = " on " + effectTarget.get("name") + ".";
         }
-        Observer.notify("LogAddMessage", new Message(user.get("name")+ " used " + skillName + targetMsg))
+        Observer.notify(
+          "LogAddMessage",
+          new Message(user.get("name") + " used " + skillName + targetMsg)
+        );
       }
-
-    } 
+    }
     // else if(skill.type === "Debuff")
     // {
 
-    // } 
+    // }
     else {
-      
-
       //calculate skill use result
-      skillResult = skill.onUse(skillLevel, {"MP_Spent": mp_spent});
+      skillResult = skill.onUse(skillLevel, { MP_Spent: mp_spent });
       if (!("damageMult" in skillResult)) {
         skillResult["damageMult"] = 1;
       }

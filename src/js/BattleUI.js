@@ -3,16 +3,6 @@ import "../css/Battle.css";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import {
-  NameHP,
-  Level,
-  Attack,
-  Defense,
-  SP,
-  MP,
-  ActionsLeft,
-  Charge
-} from "./CombatUI";
 import Button from "react-bootstrap/Button";
 import { toEng } from "./globals";
 import Observer from "./Observer";
@@ -69,15 +59,17 @@ export class BattlePlayerUI extends React.Component {
           <LevelATKDEFWindow statusSheet={statusSheet} />
           <Row className="window-border">
             <Col>
-              <SP
-                SP_now={statusSheet.getval("SP_now")}
-                SP={statusSheet.getval("SP_max")}
+              <ThreeBoxResource
+                name={"SP"}
+                val={statusSheet.getval("SP_now")}
+                valmax={statusSheet.getval("SP_max")}
               />
             </Col>
             <Col>
-              <MP
-                MP_now={statusSheet.getval("MP_now")}
-                MP={statusSheet.getval("MP_max")}
+              <ThreeBoxResource
+                name={"MP"}
+                val={statusSheet.getval("MP_now")}
+                valmax={statusSheet.getval("MP_max")}
               />
             </Col>
             <Col>
@@ -123,7 +115,7 @@ export class BattleEnemyUI extends React.Component {
         <Container>
           <NameHPWindow statusSheet={statusSheet} />
           <StatusWindow statusSheet={statusSheet} />
-          <LevelATKDEFWindow statusSheet={statusSheet}/>
+          <LevelATKDEFWindow statusSheet={statusSheet} />
           <Row className="window-border">
             <Col>
               <Charge
@@ -234,23 +226,111 @@ function NameHPWindow(props) {
 }
 
 function StatusWindow(props) {
-  // let statusSheet = props.statusSheet;
-  return <Row className="window-border status-effects-bar" />;
+  let statusEffects = props.statusSheet.get("buffContainer");
+  let text = "";
+  Object.keys(statusEffects).forEach(element => {
+    let buff = statusEffects[element];
+    text += buff.toString();
+  });
+
+  return (
+    <Row className="window-border status-effects-bar">
+      <div className="text-offset-status">{text}</div>
+    </Row>
+  );
 }
 
 function LevelATKDEFWindow(props) {
   return (
     <Row className="window-border">
       <Col>
-        <Level level={props.statusSheet.getval("level")} />
+        <ThreeBox name={"Level"} val={props.statusSheet.getval("level")} />
       </Col>
       <Col>
-        <Attack attack={props.statusSheet.getval("atk_now")} />
+        <ThreeBoxEng name={"ATK"} val={props.statusSheet.getval("atk_now")} />
       </Col>
       <Col>
-        <Defense defense={props.statusSheet.getval("def_now")} />
+        <ThreeBoxEng name={"DEF"} val={props.statusSheet.getval("def_now")} />
       </Col>
     </Row>
   );
 }
+
+function ThreeBox(props) {
+  return (
+    <div className="statwin-three-box">
+      <div className="statwin-text">
+        {props.name}: {props.val}
+      </div>
+    </div>
+  );
+}
+function ThreeBoxEng(props) {
+  return (
+    <div className="statwin-three-box">
+      <div className="statwin-text">
+        {props.name}: {toEng(props.val)}
+      </div>
+    </div>
+  );
+}
+function ThreeBoxResource(props) {
+  return (
+    <div className="statwin-three-box">
+      <div className="statwin-text">
+        {props.name}: {toEng(props.val)}/{toEng(props.valmax)}
+      </div>
+    </div>
+  );
+}
+
+function NameHP(props) {
+  let hppercent =
+    Math.min(100, (100 * (props.hp_now / props.hp)).toFixed(1)).toString() +
+    "%";
+  console.log(hppercent);
+  return (
+    <div className="statwin-namehp">
+      <div className="namehp" style={{ width: hppercent }}>
+        {/* <div className="HPBar"> */}
+          {props.name} HP: {toEng(props.hp_now)}
+        {/* </div> */}
+      </div>
+    </div>
+  );
+}
+function ActionsLeft(props) {
+  return (
+    <div className="statwin-three-box">
+      <div className="ActionsLeft">Actions: {toEng(props.ActionsLeft)}</div>
+    </div>
+  );
+}
+
+function Charge(props) {
+  let chargeColor = "black",
+    chargeWeight = "normal",
+    chargeBlink = "";
+  if (props.charge_now === props.charge_max) {
+    chargeColor = "red";
+    chargeWeight = "bold";
+    chargeBlink = "blinker 1s step-start infinite";
+  }
+
+  return (
+    <div className="statwin-three-box">
+      <div
+        className="charge"
+        style={{
+          color: chargeColor,
+          fontWeight: chargeWeight,
+          animation: chargeBlink
+        }}
+      >
+        Charge: {toEng(props.charge_now)}/{toEng(props.charge_max)}
+      </div>
+    </div>
+  );
+}
+
 export default { BattlePlayerUI, BattleEnemyUI };
