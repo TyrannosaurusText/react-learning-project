@@ -20,7 +20,8 @@ class Window extends React.Component {
       PlayerTarget: 0,
       Enemies: {},
       Player: new Stats(),
-      enemyUIVisibility: null
+      enemyUIVisibility: null,
+      turn:"Player"
     };
 
     //game will probably crash if this is misused

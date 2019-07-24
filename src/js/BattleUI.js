@@ -43,6 +43,7 @@ function SkillButton(props) {
     </Button>
   );
 }
+
 export class BattlePlayerUI extends React.Component {
   addButton(i) {
     const statusSheet = this.props.PlayerStats;
@@ -63,28 +64,9 @@ export class BattlePlayerUI extends React.Component {
     if (statusSheet)
       return (
         <Container>
-          <Row className="standard-bar">
-            <Col className="window-border">
-              <NameHP
-                name={statusSheet.getval("name")}
-                hp_now={statusSheet.getval("hp_now")}
-                hp={statusSheet.getval("hp_max")}
-              />
-            </Col>
-          </Row>
-          <Row className="window-border status-effects-bar">
-          </Row>
-          <Row className="window-border">
-            <Col>
-              <Level level={statusSheet.getval("level")} />
-            </Col>
-            <Col>
-              <Attack attack={statusSheet.getval("atk_now")} />
-            </Col>
-            <Col>
-              <Defense defense={statusSheet.getval("def_now")} />
-            </Col>
-          </Row>
+          <NameHPWindow statusSheet={statusSheet} />
+          <StatusWindow statusSheet={statusSheet} />
+          <LevelATKDEFWindow statusSheet={statusSheet} />
           <Row className="window-border">
             <Col>
               <SP
@@ -103,7 +85,7 @@ export class BattlePlayerUI extends React.Component {
             </Col>
           </Row>
 
-          <Row >
+          <Row>
             <Col className="skillBox">
               <div className="statwin-skills">
                 <div className="skills">
@@ -139,28 +121,9 @@ export class BattleEnemyUI extends React.Component {
     if (statusSheet)
       return (
         <Container>
-          <Row className="standard-bar">
-            <Col className="window-border">
-              <NameHP
-                name={statusSheet.getval("name")}
-                hp_now={statusSheet.getval("hp_now")}
-                hp={statusSheet.getval("hp_max")}
-              />
-            </Col>
-          </Row>
-          <Row className="window-border status-effects-bar">
-          </Row>
-          <Row className="window-border">
-            <Col>
-              <Level level={statusSheet.getval("level")} />
-            </Col>
-            <Col>
-              <Attack attack={statusSheet.getval("atk_now")} />
-            </Col>
-            <Col>
-              <Defense defense={statusSheet.getval("def_now")} />
-            </Col>
-          </Row>
+          <NameHPWindow statusSheet={statusSheet} />
+          <StatusWindow statusSheet={statusSheet} />
+          <LevelATKDEFWindow statusSheet={statusSheet}/>
           <Row className="window-border">
             <Col>
               <Charge
@@ -225,7 +188,9 @@ function miniEnemyDisplay(props) {
   let val = props.getval("positionIndex");
 
   let chargeBlink =
-    props.getval("charge_now") === props.getval("charge_max") ? "blinker 1s step-start infinite" : "";
+    props.getval("charge_now") === props.getval("charge_max")
+      ? "blinker 1s step-start infinite"
+      : "";
 
   return (
     <div
@@ -244,7 +209,7 @@ function miniEnemyDisplay(props) {
           toEng(props.getval("atk_now")) +
           " DEF: " +
           toEng(props.getval("def_now"))}
-        <div className="inline" style={{animation:chargeBlink}}>
+        <div className="inline" style={{ animation: chargeBlink }}>
           {" Charge: " +
             props.getval("charge_now") +
             "/" +
@@ -254,5 +219,38 @@ function miniEnemyDisplay(props) {
     </div>
   );
 }
+function NameHPWindow(props) {
+  return (
+    <Row className="standard-bar">
+      <Col className="window-border">
+        <NameHP
+          name={props.statusSheet.getval("name")}
+          hp_now={props.statusSheet.getval("hp_now")}
+          hp={props.statusSheet.getval("hp_max")}
+        />
+      </Col>
+    </Row>
+  );
+}
 
+function StatusWindow(props) {
+  // let statusSheet = props.statusSheet;
+  return <Row className="window-border status-effects-bar" />;
+}
+
+function LevelATKDEFWindow(props) {
+  return (
+    <Row className="window-border">
+      <Col>
+        <Level level={props.statusSheet.getval("level")} />
+      </Col>
+      <Col>
+        <Attack attack={props.statusSheet.getval("atk_now")} />
+      </Col>
+      <Col>
+        <Defense defense={props.statusSheet.getval("def_now")} />
+      </Col>
+    </Row>
+  );
+}
 export default { BattlePlayerUI, BattleEnemyUI };
