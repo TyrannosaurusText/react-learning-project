@@ -190,22 +190,36 @@ class Stats {
     let new_max_val = this.get(buff_stat).copy().multiplyBy(this.get(buff_mult)).round();
     let percentChange = (new_max_val).copy().divideBy(this.get(buff_max))
     this.set(buff_max, new_max_val);
-    this.get(buff_now).multiplyBy(percentChange);
+    this.get(buff_now).multiplyBy(percentChange).round();
+  }
+
+  decrementBuffDurations(){
+    // console.log("enter")
+    let buffContainer = this.get("buffContainer");
+    Object.keys(buffContainer).forEach((element)=>{
+      let expirationCheck = buffContainer[element].decrement();
+      if(expirationCheck){
+        buffContainer[element].removeFrom(this);
+        
+      }
+      // console.log(expirationCheck)
+    })
   }
 
   setMobStats(mob, level, rarity, hp, atk, def) {
     if (this.isPlayer) return;
-    this.setval("name", rarity + mob.name);
-    this.setval("level", Math.max(mob.minLevel, level));
-    this.setval("rarity", rarity);
-    this.setval("hp", hp);
-    this.setval("atk", atk);
-    this.setval("def", def);
-    this.setval("skillLevels", mob.skillLevels(level));
-    this.setval("type", mob.type);
-    this.setval("turns", mob.turns);
-    this.setval("charge", mob.charge);
-    this.setval("AI", mob.AI);
+    this.set("name", rarity + mob.name);
+    this.set("level", Math.max(mob.minLevel, level));
+    this.set("rarity", rarity);
+    // console.log(hp, atk, def, mob.turns, mob.charge)
+    this.set("hp", hp);
+    this.set("atk", atk);
+    this.set("def", def);
+    this.set("skillLevels", mob.skillLevels(level));
+    this.set("type", mob.type);
+    this.set("turns", (mob.turns).copy());
+    this.set("charge", (mob.charge).copy());
+    this.set("AI", mob.AI);
   }
   contains(key) {
     if (key in this.container && this.get(key)) return true;

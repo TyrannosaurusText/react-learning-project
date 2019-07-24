@@ -29,7 +29,7 @@ export let SkillList = {
       let max = Math.ceil(skillLevel/2) + 2;
       let rand = getRndmInteger(min, max);
       let word = tupleWord(rand) + skillEnum.Strike;
-      return { damageMult: 1+(.05*skillLevel), hitCount: rand, skillName: word };
+      return { damageMult: 1+(.001*skillLevel), hitCount: rand, skillName: word };
     },
     targets: 1
   },
@@ -99,13 +99,13 @@ export let SkillList = {
     name: skillEnum.ATKUP,
     type: "Buff",
     duration: 4,
-    cooldown: 2,
+    cooldown: 10,
     target: "self",
     upgrade_type: "SkillPoint",
     cost_mult: 10,
     onUse: (skillLevel=1, user)=>{
       if (user===null) return null;
-      let obj = {buff: new Buff(skillEnum.ATKUP, 4, {"atk":20+.2*skillLevel})}
+      let obj = {statusEffect: new Buff(skillEnum.ATKUP, 4, {"atk":20+.2*skillLevel})}
       return obj;
     }
   },
@@ -114,14 +114,14 @@ export let SkillList = {
     name: skillEnum.ATKUP,
     type: "Debuff",
     duration: 4,
-    cooldown: 2,
-    target: "enemy",
+    cooldown: 10,
+    target: "single",
     upgrade_type: "SkillPoint",
     cost_mult: 10,
     onUse: (skillLevel=1, user)=>{
       if (user===null) return null;
       
-      let obj = {debuff: new Debuff(skillEnum.ATKDOWN, 4, {"atk":20+.2*skillLevel})}
+      let obj = {statusEffect: new Debuff(skillEnum.ATKDOWN, 4, {"atk":20+.2*skillLevel})}
       return obj
     }
   }

@@ -34,22 +34,22 @@ let MonsterList = {
   }
 };
 let rarityNames = {
-  0: "Weakest ",
-  1: "Weaker ",
-  2: "Weak ",
-  3: "Sick ",
-  4: "Lesser ",
+  0: "Weakened ",
+  1: "Injured ",
+  2: "Lesser ",
+  3: "Exhausted ",
+  4: "Tired ",
   5: "",
   6: "Unusual ",
   7: "Strong ",
   8: "Giant ",
   9: "Alpha ",
-  10: "Rare ",
-  11: "Omega ",
-  12: "Legendary ",
-  13: "Ancient ",
-  14: "Ultimate ",
-  15: "World-ender "
+  10: "Omega ",
+  11: "Rumored ",
+  12: "Nightmare ",
+  13: "Legendary ",
+  14: "Mythical ",
+  15: "Ultimate "
 };
 
 export function MonsterGeneration(name, level, rarity) {

@@ -155,7 +155,7 @@ export class EnemyPlayer {
         update["index"] = index;
         await sleep(timeout);
         Observer.notify("BattleEnemyUseSkill", update);
-
+        
         // timeout += 500;
       }
     }

@@ -49,8 +49,11 @@ class Battle {
       this.notifyEnemyUseSkill(update["skillName"], update["index"]);
     });
     Observer.subscribe("BattlePlayerTurn", "Battle", () => {
+      Object.keys(this.statusEnemies).forEach((element)=>{
+        this.statusEnemies[element].decrementBuffDurations();
+      })
       this.turn = "Player";
-      console.log("turn changed")
+      // console.log("players turn")
       this.statusPlayer.set("turns_now", this.statusPlayer.get("turns_max").copy());
       this.add("Player", this.statusPlayer);
       this.sendUpdate();
@@ -110,7 +113,7 @@ class Battle {
       let numMonsters = getRndmInteger(4, 4);
       for (var i = 0; i < numMonsters; i++) {
         let leveloffset = getRndmInteger(0, 10);
-        let rarity = getRndmInteger(0, 1);
+        let rarity = getRndmInteger(5, 15);
         temp = MonsterGeneration("Enemy", level + leveloffset, rarity);
         temp.setBattleStats();
         temp.set("name", temp.get("name"));
@@ -162,6 +165,7 @@ class Battle {
     }
     if (turns - 1 <= 0) {
       this.turn = "Enemy";
+      player.decrementBuffDurations();
       Observer.notify("BattleEnemyTurn", true);
     }
   }
@@ -216,30 +220,39 @@ class Battle {
       } else if (skill.target === "Boss") {
       } else if (skill.target === "All") {
       }
-    } else if (skill.type === "Buff") {
-      //TODO: Add temporary buff mechanism.
-      let target = null;
-      if(skill.target === "self")
-        target = user;
+    } else if (skill.type === "Buff" || skill.type === "Debuff") {
+      let effectTarget = null;
+      if(skill.target === "self"){
+        effectTarget = user;
+      }
+      else if(skill.target === "single")
+      {
+        effectTarget = target;
+      }
       else if(skill.target ==="All")
       {
-        target = this.statusEnemies; //as of now player is only solo.
+        effectTarget = this.statusEnemies; //as of now player is only solo.
       }
-      let result = skill.onUse(skillLevel, target);
+      let result = skill.onUse(skillLevel, effectTarget);
       if(skill.target === "All")
       {
         //todo
       }
       else
       {
-        result.buff.applyTo(target);
-        Observer.notify("LogAddMessage", new Message(target.get("name")+ " used " + skillName +"."))
+        result.statusEffect.applyTo(effectTarget);
+        let targetMsg = ".";
+        if(skill.target === "single"){
+          targetMsg = " on " + effectTarget.get("name")+".";
+        }
+        Observer.notify("LogAddMessage", new Message(user.get("name")+ " used " + skillName + targetMsg))
       }
 
-    } else if(skill.type === "Debuff")
-    {
-
     } 
+    // else if(skill.type === "Debuff")
+    // {
+
+    // } 
     else {
       let bonusMult = new NumberContainer(1);
       if ("SP_Cost" in skill) {

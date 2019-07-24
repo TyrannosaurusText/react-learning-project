@@ -1,4 +1,3 @@
-import Observer from "./Observer";
 
 // import Stats from "./Stats";
 // import Observer from "./Observer";
@@ -32,6 +31,13 @@ class TemporaryStatus {
       stats.removeBuff(this, key, this.buff_obj[key]/100)
     });
   }
+  decrement(){
+    this.duration -=1;
+    if(this.duration <= 0){
+      return true
+    }
+    return false;
+  }
   reapply(stats, buff) {
     this.removeFrom(stats);
     Object.keys(buff.buff_obj).forEach(key => {
@@ -46,6 +52,18 @@ export class Debuff extends TemporaryStatus {
   constructor(name, buff_obj, duration) {
     super(name, buff_obj, duration);
     this.type = "Debuff";
+  }
+  applyTo(stats) {
+    this.stats = stats;
+    Object.keys(this.buff_obj).forEach(key => {
+      console.log(key, this.buff_obj[key]/100)
+      stats.addBuff(this, key, -1*this.buff_obj[key]/100)
+    });
+  }
+  removeFrom(stats) {
+    Object.keys(this.buff_obj).forEach(key => {
+      stats.removeBuff(this, key, -1*this.buff_obj[key]/100)
+    });
   }
 }
 export class Buff extends TemporaryStatus {
