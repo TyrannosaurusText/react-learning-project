@@ -17,18 +17,18 @@ class TemporaryStatus {
     this.name = name;
     this.duration = duration;
     this.buff_obj = buff_obj;
+    this.sign = 1;
   }
 
   applyTo(stats) {
     this.stats = stats;
     Object.keys(this.buff_obj).forEach(key => {
-      console.log(key, this.buff_obj[key]/100)
-      stats.addBuff(this, key, this.buff_obj[key]/100)
+      stats.addBuff(this, key, this.sign*this.buff_obj[key]/100)
     });
   }
   removeFrom(stats) {
     Object.keys(this.buff_obj).forEach(key => {
-      stats.removeBuff(this, key, this.buff_obj[key]/100)
+      stats.removeBuff(this, key, this.sign*this.buff_obj[key]/100)
     });
   }
 
@@ -53,19 +53,19 @@ export class Debuff extends TemporaryStatus {
   constructor(name, buff_obj, duration) {
     super(name, buff_obj, duration);
     this.type = "Debuff";
+    this.sign = -1;
   }
-  applyTo(stats) {
-    this.stats = stats;
-    Object.keys(this.buff_obj).forEach(key => {
-      console.log(key, this.buff_obj[key]/100)
-      stats.addBuff(this, key, -1*this.buff_obj[key]/100)
-    });
-  }
-  removeFrom(stats) {
-    Object.keys(this.buff_obj).forEach(key => {
-      stats.removeBuff(this, key, -1*this.buff_obj[key]/100)
-    });
-  }
+  // applyTo(stats) {
+  //   this.stats = stats;
+  //   Object.keys(this.buff_obj).forEach(key => {
+  //     stats.addBuff(this, key, -1*this.buff_obj[key]/100)
+  //   });
+  // }
+  // removeFrom(stats) {
+  //   Object.keys(this.buff_obj).forEach(key => {
+  //     stats.removeBuff(this, key, -1*this.buff_obj[key]/100)
+  //   });
+  // }
   toString(){
     let text = ""
     Object.keys(this.buff_obj).forEach(key => {

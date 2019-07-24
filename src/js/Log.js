@@ -33,7 +33,6 @@ class Log extends React.Component
         if(update.getType() === "Message")
         {
             this.addMsg(update);
-            // console.log(this.state.msgQueue);
         }
     }
     addMsg(msg)

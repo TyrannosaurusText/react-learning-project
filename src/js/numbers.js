@@ -28,7 +28,7 @@ export class NumberContainer {
     return this.val < rhs
   }
   gte(rhs){
-      return !(this.gt(rhs));
+      return !(this.lt(rhs));
   }
   eq(rhs){
     if (rhs instanceof NumberContainer) return this.val === rhs.val

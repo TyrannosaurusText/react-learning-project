@@ -35,7 +35,6 @@ class EnemyAI {
     this.ai = EnemyAIList[EnemyAIName];
   }
   getNext(stats) {
-    // console.log(this);
     let trigger = this.ai.trigger;
     let hp_percent = 100*stats.getval("hp_now") / stats.getval("hp");
     let skillName = "";
@@ -142,21 +141,19 @@ export class EnemyPlayer {
     for (var i = 0; i < keys.length; i++) {
       let key = keys[i];
       let enemy = this.enemyParty[key];
-      this.turns_now = enemy.getval("turns");
+      this.turns_now = enemy.get("turns_max").copy();
       let index = enemy.getval("positionIndex");
 
-      if (this.turns_now) {
-        // console.log(this.enemyAI)
+      while (this.turns_now.gt(0)) {
+        console.log(this.turns_now)
         let skillName = this.enemyAI[index].getNext(enemy);
-        this.turns_now--;
         // console.log("skill: ", skillName);
         let update = {};
         update["skillName"] = skillName;
         update["index"] = index;
-        await sleep(timeout);
         Observer.notify("BattleEnemyUseSkill", update);
-        
-        // timeout += 500;
+        // await sleep(timeout);
+        this.turns_now.minus(1);
       }
     }
 

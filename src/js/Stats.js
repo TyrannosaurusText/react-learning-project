@@ -2,15 +2,16 @@ import Observer from "./Observer";
 import Message from "./Message";
 import { NumberContainer, constNumberContainer } from "./numbers";
 class Stats {
-  constructor(StatusObj={}) {
+  constructor(StatusObj = {}) {
     this.container = StatusObj;
     this.container["buffContainer"] = {};
   }
   do_damage(target, skill, bonusMult) {
     if (!target instanceof Stats) return;
-    return target.take_damage(
+
+    let dmgDealt =
+    target.take_damage(
       this.get("name"),
-      skill.skillName,
       this.get("atk_now")
         .copy()
         .multiplyBy(skill.damageMult)
@@ -18,8 +19,9 @@ class Stats {
         .multiplyBy(bonusMult),
       skill["hitCount"] ? skill["hitCount"] : 1
     );
+    return dmgDealt;
   }
-  take_damage(userName, skillName, damage, hitCount) {
+  take_damage(userName, damage, hitCount) {
     let dmgTaken = damage
       .minus(this.get("def_now"))
       .multiplyBy(hitCount)
@@ -44,16 +46,7 @@ class Stats {
     } else {
       this.set("hp_now", this.get("hp_now").minus(dmgTaken));
     }
-    Observer.notify(
-      "LogAddMessage",
-      new Message(
-        damageMessage(userName, skillName, this.get("name"), dmgTaken.val),
-        {
-          Battle: "Damage dealt."
-        }
-      )
-    );
-
+   
     return dmgTaken;
   }
   getType() {
@@ -97,7 +90,8 @@ class Stats {
     }
   }
   getSkillLevel(key) {
-    return this.get("skillLevels")[key];
+    let val = this.get("skillLevels")[key];
+    return val ? val : 0;
   }
 
   // static verifyObj(obj) {
@@ -115,21 +109,24 @@ class Stats {
   //   return true;
   // }
   copy() {
-    let copyStats = new Stats({})
-    Object.keys(this.container).forEach((element)=>{
-      if(this.container[element] instanceof constNumberContainer)
-      {
-        copyStats.set(element, this.container[element].copy())
-      }
-      else{ //will need to change if nested json objects are in container
-        copyStats.set(element, JSON.parse(JSON.stringify(this.container[element])));
+    let copyStats = new Stats({});
+    Object.keys(this.container).forEach(element => {
+      if (this.container[element] instanceof constNumberContainer) {
+        copyStats.set(element, this.container[element].copy());
+      } else {
+        //will need to change if nested json objects are in container
+        copyStats.set(
+          element,
+          JSON.parse(JSON.stringify(this.container[element]))
+        );
       }
     });
-    console.log(copyStats);
+    // console.log(copyStats);
 
     return copyStats;
   }
-  setBattleStats() {//TODO: probably add equipment effects + multipliers here.
+  setBattleStats() {
+    //TODO: probably add equipment effects + multipliers here.
     let vals = ["hp", "atk", "def", "SP", "MP", "turns"];
     vals.forEach(element => {
       // console.log(this.getval(element));
@@ -142,68 +139,68 @@ class Stats {
         element + "_max",
         val > 0 ? new NumberContainer(val) : new NumberContainer(0)
       );
-      this.set( 
-        element + "_mult", new NumberContainer(1));
+      this.set(element + "_mult", new NumberContainer(1));
     });
     if ("charge" in this.container) {
       this.set("charge_now", new NumberContainer(0));
       this.set("charge_max", new NumberContainer(this.getval("charge")));
       this.set("no_charge_attack", new NumberContainer(0));
     }
+    this.set("targetIndex", 0);
   }
 
-  /** 
+  /**
    * key = atk, def, mp, sp etc.
    * val = number
    */
-  addBuff(buff, buff_stat, val){
+  addBuff(buff, buff_stat, val) {
     let buffContainer = this.get("buffContainer");
-    if(buff.name in buffContainer){
+    if (buff.name in buffContainer) {
       //buff already applied, reapply the buff,
       //if it is better increase the value
       //if the duration is longer, reset the duration.
       buff.reapply(this, buff);
-    }
-    else{
-      this.handleBuff(buff_stat, val)
+    } else {
+      this.handleBuff(buff_stat, val);
       buffContainer[buff.name] = buff;
     }
-
   }
 
-  removeBuff(buff, key, val)
-  {
+  removeBuff(buff, key, val) {
     let buffContainer = this.get("buffContainer");
-    if(buff.name in buffContainer){
-      this.handleBuff(key, -1*val)
-      delete buffContainer[buff.name]
+    if (buff.name in buffContainer) {
+      this.handleBuff(key, -1 * val);
+      delete buffContainer[buff.name];
     }
     //else do nothing
   }
 
-  handleBuff(buff_stat, val)
-  {
-    let buff_mult = buff_stat+"_mult";
-    let buff_max = buff_stat+"_max";
-    let buff_now = buff_stat+"_now";      
-    this.plus(buff_mult, val)
-    let new_max_val = this.get(buff_stat).copy().multiplyBy(this.get(buff_mult)).round();
-    let percentChange = (new_max_val).copy().divideBy(this.get(buff_max))
+  handleBuff(buff_stat, val) {
+    let buff_mult = buff_stat + "_mult";
+    let buff_max = buff_stat + "_max";
+    let buff_now = buff_stat + "_now";
+    this.plus(buff_mult, val);
+    let new_max_val = this.get(buff_stat)
+      .copy()
+      .multiplyBy(this.get(buff_mult))
+      .round();
+    let percentChange = new_max_val.copy().divideBy(this.get(buff_max));
     this.set(buff_max, new_max_val);
-    this.get(buff_now).multiplyBy(percentChange).round();
+    this.get(buff_now)
+      .multiplyBy(percentChange)
+      .round();
   }
 
-  decrementBuffDurations(){
+  decrementBuffDurations() {
     // console.log("enter")
     let buffContainer = this.get("buffContainer");
-    Object.keys(buffContainer).forEach((element)=>{
+    Object.keys(buffContainer).forEach(element => {
       let expirationCheck = buffContainer[element].decrement();
-      if(expirationCheck){
+      if (expirationCheck) {
         buffContainer[element].removeFrom(this);
-        
       }
       // console.log(expirationCheck)
-    })
+    });
   }
 
   setMobStats(mob, level, rarity, hp, atk, def) {
@@ -217,27 +214,14 @@ class Stats {
     this.set("def", def);
     this.set("skillLevels", mob.skillLevels(level));
     this.set("type", mob.type);
-    this.set("turns", (mob.turns).copy());
-    this.set("charge", (mob.charge).copy());
+    this.set("turns", mob.turns.copy());
+    this.set("charge", mob.charge.copy());
     this.set("AI", mob.AI);
   }
   contains(key) {
     if (key in this.container && this.get(key)) return true;
     return false;
   }
-}
-
-function damageMessage(userName, skillName, targetName, dmgTaken) {
-  return (
-    userName +
-    " used " +
-    skillName +
-    " on " +
-    targetName +
-    " dealing " +
-    dmgTaken +
-    " damage!"
-  );
 }
 
 export default Stats;

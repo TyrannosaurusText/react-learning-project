@@ -18,7 +18,7 @@ let MonsterList = {
     type: "normal",
     minRarity: 0,
     maxRarity: 5,
-    turns: new constNumberContainer(1),
+    turns: new constNumberContainer(2),
     desc: "An Enemy!",
     AI: "Enemy",
     charge: new constNumberContainer(3),
@@ -73,7 +73,6 @@ function calc(scale, base, level, minlevel, rarity, rarityScale) {
   // console.log(base, Math.pow(1 + scale, level), Math.pow(2, rarity))
   let val = 
     base.copy().multiplyBy(scale.copy().plus(1).toPower(level-minlevel)).multiplyBy(Math.pow(rarityScale, rarity-5)).trunc()
-  console.log(val.lte(1))
   if(val.lt(1))
   {
     return new NumberContainer(1)

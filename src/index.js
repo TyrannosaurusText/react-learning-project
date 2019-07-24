@@ -21,11 +21,8 @@ class Game extends React.Component {
     let stats = newJobReincarnator.copy(); //deep clone
     let skills = Skills.fillSkills("Strike", "Flame Strike", "ATK Up", "ATK Down");
     stats.set("equippedSkills", skills);
-    console.log(stats)
     this.player = new Player(stats);
 
-    // this.player = new Player(status);
-    // console.log(Player.getPlayer());
     this.battle = new Battle();
 
   }

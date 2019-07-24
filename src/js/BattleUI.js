@@ -288,7 +288,6 @@ function NameHP(props) {
   let hppercent =
     Math.min(100, (100 * (props.hp_now / props.hp)).toFixed(1)).toString() +
     "%";
-  console.log(hppercent);
   return (
     <div className="statwin-namehp">
       <div className="namehp" style={{ width: hppercent }}>

@@ -9,7 +9,7 @@ import "../css/Battle.css";
 import Log from "./Log.js";
 // import Message from "./Message";
 import Observer from "./Observer";
-import Stats from "./Stats";
+// import Stats from "./Stats";
 import { BattleEnemyUI, BattlePlayerUI } from "./BattleUI";
 
 class Window extends React.Component {
@@ -19,13 +19,11 @@ class Window extends React.Component {
       Battle: true,
       PlayerTarget: 0,
       Enemies: {},
-      Player: new Stats(),
+      // Player: new Stats(),
+      Party: {},
       enemyUIVisibility: null,
       turn:"Player"
     };
-
-    //game will probably crash if this is misused
-    //expected update = {data: (stuff) key:"data"}
 
     Observer.subscribe("BattleStateChange", "Window", update => {
       this.notifyStateChange(update);
@@ -46,7 +44,7 @@ class Window extends React.Component {
     if (!this._isMounted) return;
     Object.keys(update).forEach(element => {
       if (!(element in this.state)) {
-        console.log(element + "is not a valid key!");
+        console.error(element + "is not a valid key!");
         return;
       }
     });
@@ -111,7 +109,7 @@ class Window extends React.Component {
                   <div className="team0">
                     <BattlePlayerUI
                       useSkill={i => this.useSkill(i)}
-                      PlayerStats={this.state.Player}
+                      PlayerStats={this.state.Party[0]}
                     />
                   </div>
                   <div className="team1">
