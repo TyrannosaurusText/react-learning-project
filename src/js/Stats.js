@@ -5,12 +5,12 @@ class Stats {
   constructor(StatusObj = {}) {
     this.container = StatusObj;
     this.container["buffContainer"] = {};
+    this.container["cooldownContainer"] = {};
   }
   do_damage(target, skill, bonusMult) {
     if (!target instanceof Stats) return;
 
-    let dmgDealt =
-    target.take_damage(
+    let dmgDealt = target.take_damage(
       this.get("name"),
       this.get("atk_now")
         .copy()
@@ -46,7 +46,7 @@ class Stats {
     } else {
       this.set("hp_now", this.get("hp_now").minus(dmgTaken));
     }
-   
+
     return dmgTaken;
   }
   getType() {
@@ -141,7 +141,7 @@ class Stats {
       );
       this.set(element + "_mult", new NumberContainer(1));
     });
-    if ("charge" in this.container) {
+    if (this.container["charge"]!=null) {
       this.set("charge_now", new NumberContainer(0));
       this.set("charge_max", new NumberContainer(this.getval("charge")));
       this.set("no_charge_attack", new NumberContainer(0));
@@ -155,7 +155,7 @@ class Stats {
    */
   addBuff(buff, buff_stat, val) {
     let buffContainer = this.get("buffContainer");
-    if (buff.name in buffContainer) {
+    if (buff.name in buffContainer) { //dont change this 'in' operator
       //buff already applied, reapply the buff,
       //if it is better increase the value
       //if the duration is longer, reset the duration.
@@ -168,7 +168,7 @@ class Stats {
 
   removeBuff(buff, key, val) {
     let buffContainer = this.get("buffContainer");
-    if (buff.name in buffContainer) {
+    if (buff.name in buffContainer) { //dont change this 'in' operator
       this.handleBuff(key, -1 * val);
       delete buffContainer[buff.name];
     }
@@ -200,6 +200,20 @@ class Stats {
         buffContainer[element].removeFrom(this);
       }
       // console.log(expirationCheck)
+    });
+  }
+
+  putOnCooldown(skillName, cd){
+    this.get('cooldownContainer')[skillName] = cd;
+  }
+
+  decrementSkillCooldown() {
+    let cooldownContainer = this.get("cooldownContainer");
+    Object.keys(cooldownContainer).forEach(element => {
+      let val = cooldownContainer[element]--;
+      if (val === 0) {
+        delete cooldownContainer[element];
+      }
     });
   }
 

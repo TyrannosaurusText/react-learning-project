@@ -1,8 +1,8 @@
 // import Skills from "./Skills";
 import Stats from "./Stats";
 import { Clamp } from "./globals";
-import {NumberContainer, constNumberContainer} from "./numbers"
-
+import { NumberContainer, constNumberContainer } from "./numbers";
+import { getRndmInteger } from "./random";
 
 let MonsterList = {
   Enemy: {
@@ -17,8 +17,8 @@ let MonsterList = {
     defScale: new constNumberContainer(0.1),
     type: "normal",
     minRarity: 0,
-    maxRarity: 5,
-    turns: new constNumberContainer(2),
+    maxRarity: 7,
+    turns: new constNumberContainer(1),
     desc: "An Enemy!",
     AI: "Enemy",
     charge: new constNumberContainer(3),
@@ -52,15 +52,32 @@ let rarityNames = {
   15: "Ultimate "
 };
 
-export function MonsterGeneration(name, level, rarity) {
-  if (name in MonsterList) {
+export function MonsterGeneration(name, level, min_rare, max_rare) {
+  if (MonsterList[name]!=null) {
     let mob = MonsterList[name];
-    let r = Clamp(rarity, mob.minRarity, mob.maxRarity);
+
+    min_rare = Clamp(min_rare, 0, mob.minRarity);
+    max_rare = Clamp(max_rare, 0, mob.maxRarity);
+    let r = getRndmInteger(min_rare, max_rare);
     let stats = new Stats({});
 
     let hp = calc(mob.hpScale, mob.hp, level, mob.minLevel, r, mob.rarityScale);
-    let atk = calc(mob.atkScale, mob.atk, level, mob.minLevel, r, mob.rarityScale);
-    let def = calc(mob.defScale, mob.def, level, mob.minLevel, r, mob.rarityScale);
+    let atk = calc(
+      mob.atkScale,
+      mob.atk,
+      level,
+      mob.minLevel,
+      r,
+      mob.rarityScale
+    );
+    let def = calc(
+      mob.defScale,
+      mob.def,
+      level,
+      mob.minLevel,
+      r,
+      mob.rarityScale
+    );
     if (mob.maxLevel !== -1) level = Math.max(level, mob.minLevel);
 
     let rarename = rarityNames[r];
@@ -71,13 +88,19 @@ export function MonsterGeneration(name, level, rarity) {
 }
 function calc(scale, base, level, minlevel, rarity, rarityScale) {
   // console.log(base, Math.pow(1 + scale, level), Math.pow(2, rarity))
-  let val = 
-    base.copy().multiplyBy(scale.copy().plus(1).toPower(level-minlevel)).multiplyBy(Math.pow(rarityScale, rarity-5)).trunc()
-  if(val.lt(1))
-  {
-    return new NumberContainer(1)
-  }
-  else{
+  let val = base
+    .copy()
+    .multiplyBy(
+      scale
+        .copy()
+        .plus(1)
+        .toPower(level - minlevel)
+    )
+    .multiplyBy(Math.pow(rarityScale, rarity - 5))
+    .trunc();
+  if (val.lt(1)) {
+    return new NumberContainer(1);
+  } else {
     return val;
   }
 }

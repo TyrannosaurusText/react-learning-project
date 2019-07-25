@@ -123,7 +123,7 @@ export class EnemyPlayer {
       let enemy = this.enemyParty[key];
       let ai = enemy.getval("AI");
       let index = enemy.getval("positionIndex");
-      if (ai && ai in EnemyAIList) {
+      if (ai && EnemyAIList[ai] != null) {
         this.enemyAI[index] = new EnemyAI(ai);
       } else {
         throw new Error("No AI");
@@ -145,14 +145,14 @@ export class EnemyPlayer {
       let index = enemy.getval("positionIndex");
 
       while (this.turns_now.gt(0)) {
-        console.log(this.turns_now)
+        // console.log(this.turns_now)
         let skillName = this.enemyAI[index].getNext(enemy);
         // console.log("skill: ", skillName);
         let update = {};
         update["skillName"] = skillName;
         update["index"] = index;
         Observer.notify("BattleEnemyUseSkill", update);
-        // await sleep(timeout);
+        await sleep(timeout);
         this.turns_now.minus(1);
       }
     }

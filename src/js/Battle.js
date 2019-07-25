@@ -60,10 +60,7 @@ class Battle {
         "turns_now",
         this.statusParty[0].get("turns_max")
       );
-      // this.statusPlayer.set(
-      //   "turns_now",
-      //   this.statusPlayer.get("turns_max").copy()
-      // );
+     
       this.add("Party", this.statusParty);
       this.add("turn", this.turn);
       this.sendUpdate();
@@ -126,8 +123,7 @@ class Battle {
       let numMonsters = getRndmInteger(4, 4);
       for (var i = 0; i < numMonsters; i++) {
         let leveloffset = getRndmInteger(0, 10);
-        let rarity = getRndmInteger(5, 15);
-        temp = MonsterGeneration("Enemy", level + leveloffset, rarity);
+        temp = MonsterGeneration("Enemy", level + leveloffset, 0, 15);
         temp.setBattleStats();
         temp.set("name", temp.get("name"));
         temp.set("positionIndex", i);
@@ -159,6 +155,11 @@ class Battle {
       return;
     }
     let player = this.statusParty[0];
+
+    if(skillName in player.get('cooldownContainer')){
+      return; //on cooldown
+    }
+
     let target = player.getval("targetIndex");
     let enemies = this.statusEnemies;
     let isValid = Object.values(player.get("equippedSkills")).includes(
@@ -171,19 +172,26 @@ class Battle {
     let result = false;
     if (this.turn === "Player") {
       result = this.useSkill(skillName, player, enemies[target]);
+      
     }
     // console.log(result);
     let turns = player.getval("turns_now");
     if (result === true) {
       //skill was used
       player.decrement("turns_now");
+      let cd = Skills.getSkill(skillName)["cooldown"];
+      if(cd != null)
+      {
+        player.putOnCooldown(skillName, cd);
+      }
 
       if (turns - 1 <= 0) {
         //check for turn end
         this.turn = "Enemy";
         player.decrementBuffDurations();
-        this.add("turn", this.turn);
-        this.sendUpdate();
+        player.decrementSkillCooldown();
+        // this.add("turn", this.turn);
+        // this.sendUpdate();
         Observer.notify("BattleEnemyTurn", true);
       }
     }
@@ -206,6 +214,8 @@ class Battle {
     // let result = false;
     if (this.turn === "Enemy") {
       // result =
+      this.add("turn", enemy.get("name"));
+      this.sendUpdate();
       this.useSkill(skillName, enemy, target);
     }
   }
@@ -228,6 +238,18 @@ class Battle {
 
     let skillInputObj = {};
     let bonusMult = new NumberContainer(1);
+
+    if (skill["MP_Cost"]) {
+      let mp_spent = user
+        .get("MP_max")
+        .copy()
+        .multiplyBy(skill["MP_Cost"] / 100);
+      
+      if(user.get("MP") != null && mp_spent.gt(user.get("MP_now"))) return false;
+      user.get("MP_now").minus(mp_spent); 
+      skillInputObj["MP_Spent"] = mp_spent;
+    }
+
     if (skill["SP_Cost"]) {
       let sp_remaining = user
         .get("SP_now")
@@ -242,41 +264,33 @@ class Battle {
       );
       user.set("SP_now", sp_remaining);
     }
-    if (skill["MP_Cost"]) {
-      let mp_spent = user
-        .get("MP_max")
-        .copy()
-        .multiplyBy(skill["MP_Cost"] / 100).val;
-      user.get("MP_now").minus(mp_spent);
-      skillInputObj["MP_Spent"] = mp_spent;
-    }
     //check skill type then use
     let allAlly = this.turn > 0 ? this.statusParty : this.statusEnemies;
     let allTarget = this.turn > 0 ? this.statusEnemies : this.statusParty;
-    if (false) {
-      //placeholder
-      console.log(allAlly, allTarget);
-    }
-
+ 
     [skillResult, skillName] = skill.onUse(skillLevel, skillInputObj);
-
-    
-
 
     if (skillResult["self"]) {
       loopSkillResult(skillResult["self"], user, user, 1, skillName);
     }
-    if (skillResult["All"]) {
-      loopSkillResult(skillResult["All"], user, target, bonusMult, skillName);
+    if (skillResult["AllAlly"] || skillResult["All"]) {
+      loopSkillResult(skillResult["All"], user, allAlly, bonusMult, skillName);
+    }
+    if (skillResult["AllEnemy"] || skillResult["All"]) {
+      loopSkillResult(skillResult["All"], user, allTarget, bonusMult, skillName);
     }
     if (skillResult["target"]) {
-      loopSkillResult(skillResult["target"], user, target, bonusMult, skillName);
+      loopSkillResult(
+        skillResult["target"],
+        user,
+        target,
+        bonusMult,
+        skillName
+      );
     }
 
-    
-
-
     //update statuses
+    
     this.add("Party", this.statusParty);
     this.add("Enemies", this.statusEnemies);
     this.sendUpdate();
@@ -319,18 +333,32 @@ function loopSkillResult(arr, user, target, bonusMult, skillName) {
   //   arr = arr.slice(1);
   // }
   arr.forEach((element, index) => {
-    applySkillResult(arr[index][0], arr[index][1], user, target, bonusMult, skillName);
+    applySkillResult(
+      arr[index][0],
+      arr[index][1],
+      user,
+      target,
+      bonusMult,
+      skillName
+    );
   });
 }
 
-/** 
+/**
  * set - sets resource at key to val% i.e. charge_now, 100 -> sets charge to 100% capacity
  * add - adds to resource same input as set
  * sub - subtracts
  * damage - calls do_damage
  * buff/debuff - applies a statusEffect
-*/
-function applySkillResult(type, obj, user, target, bonusMult = 1, skillName="") {
+ */
+function applySkillResult(
+  type,
+  obj,
+  user,
+  target,
+  bonusMult = 1,
+  skillName = ""
+) {
   switch (type) {
     case "set":
       target.setval(obj["key"], obj["val"]);
@@ -346,10 +374,17 @@ function applySkillResult(type, obj, user, target, bonusMult = 1, skillName="") 
       let dmgTaken = user.do_damage(target, obj, bonusMult);
       Observer.notify(
         "LogAddMessage",
-        new Message(damageMessage(user.get("name"), skillName, target.get("name"), dmgTaken.val))
+        new Message(
+          damageMessage(
+            user.get("name"),
+            skillName,
+            target.get("name"),
+            dmgTaken.val
+          )
+        )
       );
       return;
-      // break;
+    // break;
     case "buff":
     case "debuff":
       obj["statusEffect"].applyTo(target);

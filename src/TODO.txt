@@ -6,9 +6,8 @@ loot! and much more
 
 damage over time debuffs
 
-skill cooldown system
-
-
 
 stretch goals:
+
+simplify skill implementation
 lets not start ok.

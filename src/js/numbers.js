@@ -1,7 +1,7 @@
 /**
  * A container for numbers
  * intended to be easily replaced if switching to bignumber.js or similar libs
- *
+ * use for numbers that are going to be large. smaller numbers i.e. cooldown time should be short
  */
 
 export class NumberContainer {

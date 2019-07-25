@@ -42,13 +42,13 @@ class Window extends React.Component {
   }
   notifyStateChange(update) {
     if (!this._isMounted) return;
-    Object.keys(update).forEach(element => {
-      if (!(element in this.state)) {
+    Object.keys(update).forEach(element => {  
+      if (this.state[element] == null) {
         console.error(element + "is not a valid key!");
         return;
       }
     });
-    if ("PlayerTarget" in update) {
+    if (update["PlayerTarget"]!=null) {
       this.updateUIVisibility(update);
     }
     this.setState(update);
@@ -58,8 +58,8 @@ class Window extends React.Component {
     let vis = this.state.enemyUIVisibility;
     let PlayerTarget = this.state.PlayerTarget;
     let Enemies = this.state.Enemies;
-    if ("Enemies" in newState) Enemies = newState.Enemies;
-    if ("PlayerTarget" in newState) PlayerTarget = newState.PlayerTarget;
+    if (newState["Enemies"] != null) Enemies = newState.Enemies;
+    if (newState["PlayerTarget"] != null) PlayerTarget = newState.PlayerTarget;
     // if (vis != null) {
     //   let newTarget = newState["PlayerTarget"];
     //   let oldTarget = this.state.PlayerTarget;

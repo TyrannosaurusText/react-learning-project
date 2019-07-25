@@ -19,7 +19,7 @@ class SuperObserver{
     }
     get(name)
     {
-        if(name in this.events)
+        if(this.events[name]!=null)
             return this.events[name];
         this.events[name] = new Observer(name);
         return this.events[name];
@@ -59,11 +59,10 @@ class Observer{
         if(SuperObserver.superObserver() == null)
             new SuperObserver()
         SuperObserver.superObserver().get(eventName)
-            .unsubscribe(eventName,subName)
+            .unsubscribe(subName)
     }
-    unsubscribe(eventName, subName)
+    unsubscribe(subName)
     {
-        if (subName in this.subscribers)
         delete this.subscribers[subName]
     }
     static notify(eventName, update)

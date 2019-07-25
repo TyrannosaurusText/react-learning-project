@@ -7,6 +7,8 @@ import Button from "react-bootstrap/Button";
 import { toEng } from "./globals";
 import Observer from "./Observer";
 import Skills from "./Skills";
+import { OverlayTrigger } from "react-bootstrap";
+import { Tooltip } from "react-bootstrap";
 // import Stats from "./Stats";
 
 function SkillButton(props) {
@@ -20,31 +22,69 @@ function SkillButton(props) {
     Earth: "Success"
   };
   let variant = "secondary";
+  let desc = props.value !== "None" ? skill.desc(props.level) : "None";
   if (skill) variant = color[skill.element];
-
-  return (
-    <Button
-      variant={variant}
-      onClick={() => {
-        props.onClick();
-      }}
-    >
-      {props.value}
-    </Button>
-  );
+  // console.log(props.cd);
+  if (props.value !== "None") {
+    let cost_str = null;
+    if(skill.MP_Cost || skill.SP_Cost)
+    cost_str = (<div>Costs: {(skill.SP_Cost ? skill.SP_Cost + " SP" : "")} {(skill.MP_Cost?skill.MP_Cost + "% MP" : "")}</div>)
+    return (
+      <OverlayTrigger
+        placement="bottom"
+        arrowProps={{fontSize:"10px"}}
+        overlay={
+          <Tooltip className="my-tooltip"  >
+            {props.value}
+            {skill.type?<div>{skill.type}</div> :""}
+            {skill.distance?<div>{skill.distance}</div> :""}
+            {cost_str?(<div>{cost_str}</div>) : ""}
+            {desc}
+          </Tooltip>
+        }
+      >
+        <Button
+          variant={variant}
+          disabled={props.onCD > 0}
+          onClick={() => {
+            props.onClick();
+          }}
+        >
+          {props.value}
+        </Button>
+      </OverlayTrigger>
+    );
+  } else
+    return (
+      <Button
+        variant={variant}
+        disabled={props.onCD > 0}
+        onClick={() => {
+          props.onClick();
+        }}
+      >
+        None
+      </Button>
+    );
 }
 
 export class BattlePlayerUI extends React.Component {
   addButton(i) {
     const statusSheet = this.props.PlayerStats;
     const equippedSkills = statusSheet.getval("equippedSkills");
+    const cdc = this.props.PlayerStats.get("cooldownContainer");
+    let skillName = equippedSkills[i];
+    const cd = cdc[skillName];
+    // console.log(cdc)
     if (!equippedSkills) return null;
     return (
       <SkillButton
-        value={equippedSkills[i]}
+        value={skillName + (cd ? " (" + cd + ")" : "")}
         stats={this.props.PlayerStats}
+        onCD={cd}
+        level={statusSheet.getSkillLevel(skillName)}
         onClick={() => {
-          this.props.useSkill(equippedSkills[i]);
+          this.props.useSkill(skillName);
         }}
       />
     );
@@ -58,20 +98,16 @@ export class BattlePlayerUI extends React.Component {
           <StatusWindow statusSheet={statusSheet} />
           <LevelATKDEFWindow statusSheet={statusSheet} />
           <Row className="window-border">
-            <Col>
-              <ThreeBoxResource
-                name={"SP"}
-                val={statusSheet.getval("SP_now")}
-                valmax={statusSheet.getval("SP_max")}
-              />
-            </Col>
-            <Col>
-              <ThreeBoxResource
-                name={"MP"}
-                val={statusSheet.getval("MP_now")}
-                valmax={statusSheet.getval("MP_max")}
-              />
-            </Col>
+            <ThreeBoxResource
+              name={"SP"}
+              val={statusSheet.getval("SP_now")}
+              valmax={statusSheet.getval("SP_max")}
+            />
+            <ThreeBoxResource
+              name={"MP"}
+              val={statusSheet.getval("MP_now")}
+              valmax={statusSheet.getval("MP_max")}
+            />
             <Col>
               <ActionsLeft ActionsLeft={statusSheet.getval("turns_now")} />
             </Col>
@@ -117,7 +153,7 @@ export class BattleEnemyUI extends React.Component {
           <StatusWindow statusSheet={statusSheet} />
           <LevelATKDEFWindow statusSheet={statusSheet} />
           <Row className="window-border">
-            <Col>
+            <Col className="bar">
               <Charge
                 charge_now={statusSheet.getval("charge_now")}
                 charge_max={statusSheet.getval("charge_max")}
@@ -243,44 +279,44 @@ function StatusWindow(props) {
 function LevelATKDEFWindow(props) {
   return (
     <Row className="window-border">
-      <Col>
-        <ThreeBox name={"Level"} val={props.statusSheet.getval("level")} />
-      </Col>
-      <Col>
-        <ThreeBoxEng name={"ATK"} val={props.statusSheet.getval("atk_now")} />
-      </Col>
-      <Col>
-        <ThreeBoxEng name={"DEF"} val={props.statusSheet.getval("def_now")} />
-      </Col>
+      <ThreeBox name={"Level"} val={props.statusSheet.getval("level")} />
+      <ThreeBoxEng name={"ATK"} val={props.statusSheet.getval("atk_now")} />
+      <ThreeBoxEng name={"DEF"} val={props.statusSheet.getval("def_now")} />
     </Row>
   );
 }
 
 function ThreeBox(props) {
   return (
-    <div className="statwin-three-box">
-      <div className="statwin-text">
-        {props.name}: {props.val}
+    <Col className="bar">
+      <div className="statwin-three-box">
+        <div className="statwin-text">
+          {props.name}: {props.val}
+        </div>
       </div>
-    </div>
+    </Col>
   );
 }
 function ThreeBoxEng(props) {
   return (
-    <div className="statwin-three-box">
-      <div className="statwin-text">
-        {props.name}: {toEng(props.val)}
+    <Col className="bar">
+      <div className="statwin-three-box">
+        <div className="statwin-text">
+          {props.name}: {toEng(props.val)}
+        </div>
       </div>
-    </div>
+    </Col>
   );
 }
 function ThreeBoxResource(props) {
   return (
-    <div className="statwin-three-box">
-      <div className="statwin-text">
-        {props.name}: {toEng(props.val)}/{toEng(props.valmax)}
+    <Col className="bar">
+      <div className="statwin-three-box">
+        <div className="statwin-text">
+          {props.name}: {toEng(props.val)}/{toEng(props.valmax)}
+        </div>
       </div>
-    </div>
+    </Col>
   );
 }
 
@@ -289,11 +325,13 @@ function NameHP(props) {
     Math.min(100, (100 * (props.hp_now / props.hp)).toFixed(1)).toString() +
     "%";
   return (
-    <div className="statwin-namehp">
-      <div className="namehp" style={{ width: hppercent }}>
-        {/* <div className="HPBar"> */}
+    <div style={{ height: "100%" }}>
+      <div className="statwin-namehp">
+        <div className="namehp" style={{ width: hppercent }}>
+          {/* <div className="HPBar"> */}
           {props.name} HP: {toEng(props.hp_now)}
-        {/* </div> */}
+          {/* </div> */}
+        </div>
       </div>
     </div>
   );

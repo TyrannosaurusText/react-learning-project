@@ -23,7 +23,7 @@ export let newJobReincarnator = new Stats({
   MP: new constNumberContainer(50),
   EXP: new constNumberContainer(0),
   turns: new constNumberContainer(1),
-  skillLevels: {Strike:1, "Flame Strike":1, "ATK Up":1, "ATK Down":1 },
+  skillLevels: {Strike:1, "Flame Strike":20, "ATK Up":1, "ATK Down":1, "Firebolt":1 },
   isPlayer: true
 });
 

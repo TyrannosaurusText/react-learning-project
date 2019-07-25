@@ -9,7 +9,7 @@ import {SkillList} from './SkillList';
 
 export function getSkill(skillName)
 {
-    if( skillName in SkillList )
+    if( SkillList[skillName] !=null )
         return SkillList[skillName]
     else return null
 }

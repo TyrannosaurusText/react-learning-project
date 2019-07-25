@@ -37,6 +37,7 @@
 
 .pos{
   display:flex;  
+  flex-shrink: 0;
   width: 98%;
   min-height: 240px;
   margin-left: 2px;
