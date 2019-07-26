@@ -12,7 +12,8 @@ export const skillEnum = {
   FullCharge: "Full Charge",
   SPMastery: "SP Mastery",
   ATKUP: "ATK Up",
-  ATKDOWN: " ATK Down"
+  ATKDOWN: "ATK Down",
+  Regen: "Regen"
 };
 
 export let SkillList = {
@@ -165,7 +166,7 @@ export let SkillList = {
       let buff = statusEffect(
         new Regen(skillEnum.Regen, 20, {
           hp: 50 + 10 * skillLevel
-        }, false)
+        }, "regenerated",false)
       );
       // return obj;
       let returnObj = returnObjectAppend({}, "self", "buff", buff);

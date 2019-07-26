@@ -205,7 +205,7 @@ class Stats {
         .round();
     }
     this.get(buff_now)
-      .plus(gainOrLoss)
+      .plus(gainOrLoss).min(this.get(buff_max).copy())
       .round();
 
     Observer.notify(
@@ -213,12 +213,12 @@ class Stats {
       new Message(
         this.get("name") +
           " is " +
-          name +
+          name + (gainOrLoss.eq(0)?", but nothing happened.":
           " and " +
-          (gainOrLoss > 0 ? "gained " : "lost ") +
+          (gainOrLoss.gt(0) ? "gained " : "lost ") +
           gainOrLoss.val +
           " " +
-          buff_stat +
+          buff_stat) +
           "."
       )
     );

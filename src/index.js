@@ -27,7 +27,8 @@ class Game extends React.Component {
       "Flame Strike",
       "ATK Up",
       "ATK Down",
-      "Firebolt"
+      "Firebolt",
+      "Regen"
     );
     stats.set("equippedSkills", skills);
     this.Log = new Log();//create log before battle

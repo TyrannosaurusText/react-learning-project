@@ -39,6 +39,16 @@ export class NumberContainer {
     else this.val = val;
     return this;
   }
+  min(val){
+    if (val instanceof NumberContainer) this.val = Math.min(this.val, val.val)
+    else Math.min(this.val, val)
+    return this;
+  }
+  max(val){
+    if (val instanceof NumberContainer) this.val = Math.max(this.val, val.val)
+    else Math.max(this.val, val)
+    return this;
+  }
   round(val){
       this.val = Math.round(this.val);
       return this;
