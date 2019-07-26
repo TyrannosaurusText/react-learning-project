@@ -10,7 +10,6 @@ class Stats {
   }
   do_damage(target, skill, bonusMult) {
     if (!target instanceof Stats) return;
-
     let dmgDealt = target.take_damage(
       this.get("name"),
       this.get("atk_now")
@@ -23,10 +22,15 @@ class Stats {
     return dmgDealt;
   }
   take_damage(userName, damage, hitCount) {
-    let dmgTaken = damage
-      .minus(this.get("def_now"))
-      .multiplyBy(hitCount)
-      .round();
+    let dmgTaken = 0;
+    if (this.get("def_now").gte(damage)) {
+      dmgTaken = new NumberContainer(1).multiplyBy(hitCount);
+    } else {
+      dmgTaken = damage
+        .minus(this.get("def_now"))
+        .multiplyBy(hitCount)
+        .round();
+    }
     // Math.round(hitCount * (damage - this.get("def_now").val));
     if (dmgTaken.gt(this.get("hp_now"))) {
       this.get("hp_now").set(0);
@@ -132,14 +136,8 @@ class Stats {
     vals.forEach(element => {
       // console.log(this.getval(element));
       let val = this.getval(element);
-      this.set(
-        element + "_now",
-        val > 0 ? new NumberContainer(val) : new NumberContainer(0)
-      );
-      this.set(
-        element + "_max",
-        val > 0 ? new NumberContainer(val) : new NumberContainer(0)
-      );
+      this.set(element + "_now", val != null ? new NumberContainer(val) : null);
+      this.set(element + "_max", val != null ? new NumberContainer(val) : null);
       this.set(element + "_mult", new NumberContainer(1));
     });
     if (this.container["charge"] != null) {
@@ -199,8 +197,6 @@ class Stats {
     let buff_max = buff_stat + "_max";
     let buff_now = buff_stat + "_now";
     let gainOrLoss = new NumberContainer(val);
-    console.log(gainOrLoss);
-    console.log(buff_now);
     if (isPercent) {
       val = val / 100;
       gainOrLoss = this.get(buff_max)
@@ -228,8 +224,11 @@ class Stats {
     );
 
     if (buff_stat === "hp" && this.get(buff_now).lte(0)) {
-      Observer.notify(ObserverEnum.AddMessage, new Message(this.get("name") + " was defeated."))
-      let event =""
+      Observer.notify(
+        ObserverEnum.AddMessage,
+        new Message(this.get("name") + " was defeated.")
+      );
+      let event = "";
       if (this.get("isPlayer")) {
         event = "BattlePlayerDefeated";
       } else {

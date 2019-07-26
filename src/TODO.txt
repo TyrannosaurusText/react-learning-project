@@ -4,10 +4,9 @@ save and load system
 death and victories
 loot! and much more
 
-damage over time debuffs
 
+later goals:
 
-stretch goals:
+todo replace statuseffect bar words with icons.
 
-simplify skill implementation
 lets not start ok.

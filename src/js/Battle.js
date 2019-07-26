@@ -240,18 +240,17 @@ class Battle {
     let skillInputObj = {};
     let bonusMult = new NumberContainer(1);
 
-    if (skill["MP_Cost"]) {
+    if (skill["MP_Cost"] && user.get("MP_max") != null) {
       let mp_spent = user
         .get("MP_max")
         .copy()
         .multiplyBy(skill["MP_Cost"] / 100).round();
-      
       if(user.get("MP") != null && mp_spent.gt(user.get("MP_now"))) return false;
       user.get("MP_now").minus(mp_spent); 
       skillInputObj["MP_Spent"] = mp_spent;
     }
 
-    if (skill["SP_Cost"]) {
+    if (skill["SP_Cost"]  && user.get("SP_now")) {
       let sp_remaining = user
         .get("SP_now")
         .copy()
