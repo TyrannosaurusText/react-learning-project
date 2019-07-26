@@ -160,7 +160,7 @@ export let SkillList = {
   },
   "Regen":{
     desc: skillLevel => {
-      return "Regenerate " + (50 +10* skillLevel) + "% of your health every turn.";
+      return "Regenerate " + (50 +10* skillLevel) + " health every turn.";
     },
     onUse: (skillLevel = 1) => {
       let buff = statusEffect(
