@@ -11,7 +11,24 @@ import { OverlayTrigger } from "react-bootstrap";
 import { Tooltip } from "react-bootstrap";
 // import Stats from "./Stats";
 
-function SkillButton(props) {
+export function BattleInfoWindow(props) {
+  return (
+    <div className="battleinfo">
+      <div className="turn-indicator">
+        current turn:
+        <div className="cut-text">{props.turn}</div>
+      </div>
+      <div className="turn-indicator battleinfo-buttons">
+        <Button className="mr-1" variant="warning">
+          Escape
+        </Button>
+        <Button variant="primary">Pass Turn</Button>
+      </div>
+    </div>
+  );
+}
+
+function SkillButtons(props) {
   let skill = Skills.getSkill(props.value);
   let color = {
     Fire: "danger",
@@ -27,46 +44,47 @@ function SkillButton(props) {
   if (props.value !== "None") {
     let cost_str = null;
     let desc = skill.desc(props.level);
-    if(skill.MP_Cost || skill.SP_Cost)
-    cost_str = (<div>Costs: {(skill.SP_Cost ? skill.SP_Cost + " SP" : "")} {(skill.MP_Cost?skill.MP_Cost + "% MP" : "")}</div>)
+    if (skill.MP_Cost || skill.SP_Cost)
+      cost_str = (
+        <div>
+          Costs: {skill.SP_Cost ? skill.SP_Cost + " SP" : ""}{" "}
+          {skill.MP_Cost ? skill.MP_Cost + "% MP" : ""}
+        </div>
+      );
     return (
       <OverlayTrigger
         trigger="hover"
         placement="bottom"
-        arrowProps={{fontSize:"10px"}}
+        arrowProps={{ fontSize: "10px" }}
         overlay={
-          <Tooltip className="my-tooltip" >
-            {props.value + " lvl "+props.level}
-            {skill.type?<div>{skill.type}</div> :""}
-            {skill.distance?<div>{skill.distance}</div> :""}
-            {cost_str?(<div>{cost_str}</div>) : ""}
+          <Tooltip className="my-tooltip">
+            {props.value + " lvl " + props.level}
+            {skill.type ? <div>{skill.type}</div> : ""}
+            {skill.distance ? <div>{skill.distance}</div> : ""}
+            {cost_str ? <div>{cost_str}</div> : ""}
             {desc}
           </Tooltip>
         }
       >
-        <Button
-          variant={variant}
-          // disabled={props.onCD > 0} //dont disable b/c bug
-          onClick={() => {
-            props.onClick();
-          }}
-        >
-          {props.value + (props.onCD ? " (" + props.onCD + ")" : "")}
-        </Button>
+        <SkillButton variant={variant} value={props.value} onCD={props.onCD} onClick={()=>{props.onClick()}}></SkillButton>
       </OverlayTrigger>
     );
   } else
     return (
-      <Button
-        variant={variant}
-        disabled={props.onCD > 0}
-        onClick={() => {
-          props.onClick();
-        }}
-      >
-        None
-      </Button>
+      <SkillButton variant={variant} value={props.value} disabled={true} onClick={()=>{}}></SkillButton>
     );
+}
+function SkillButton(props){
+  return (<Button
+    className="ml-1 mt-1 btn-block skillbutton"
+    variant={props.variant}
+    disabled={props.disabled} //dont disable b/c bug
+    onClick={() => {
+      props.onClick();
+    }}
+  >
+    {props.value + (props.onCD ? " (" + props.onCD + ")" : "")}
+  </Button>);
 }
 
 export class BattlePlayerUI extends React.Component {
@@ -79,15 +97,17 @@ export class BattlePlayerUI extends React.Component {
     // console.log(cdc)
     if (!equippedSkills) return null;
     return (
-      <SkillButton
-        value={skillName}
-        stats={this.props.PlayerStats}
-        onCD={cd}
-        level={statusSheet.getSkillLevel(skillName)}
-        onClick={() => {
-          this.props.useSkill(skillName);
-        }}
-      />
+      <div className="btn-group">
+        <SkillButtons
+          value={skillName}
+          stats={this.props.PlayerStats}
+          onCD={cd}
+          level={statusSheet.getSkillLevel(skillName)}
+          onClick={() => {
+            this.props.useSkill(skillName);
+          }}
+        />
+      </div>
     );
   }
   render() {
@@ -118,18 +138,31 @@ export class BattlePlayerUI extends React.Component {
             <Col className="skillBox">
               <div className="statwin-skills">
                 <div className="skills">
-                  <div>
-                    {this.addButton(0)}
-                    {this.addButton(1)}
-                    {this.addButton(2)}
-                    {this.addButton(3)}
-                  </div>{" "}
-                  <div>
-                    {this.addButton(4)}
-                    {this.addButton(5)}
-                    {this.addButton(6)}
-                    {this.addButton(7)}
+                  <div className="skillbar">
+                    <div className="btn-block btn-toolbar skill-btn">
+                      {this.addButton(0)}
+                      {this.addButton(1)}
+                      {this.addButton(2)}
+                      {this.addButton(3)}
+                    </div>
                   </div>
+                  <div className="skillbar">
+                    <div className="btn-block btn-toolbar skill-btn">
+                      {this.addButton(4)}
+                      {this.addButton(5)}
+                      {this.addButton(6)}
+                      {this.addButton(7)}
+                    </div>
+                  </div>
+                  <div className="skillbar">
+                    <div className="btn-block btn-toolbar skill-btn">
+                      {this.addButton(8)}
+                      {this.addButton(9)}
+                      {this.addButton(10)}
+                      {this.addButton(11)}
+                    </div>
+                  </div>
+                 
                 </div>
               </div>
             </Col>

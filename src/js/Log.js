@@ -9,17 +9,16 @@ import Observer from './Observer.js'
  * repeated msgs are stacked up to 1000 times before overflowing
  * TODO: add filter
 */
-let globalLog = null
 class Log extends React.Component
 {
     constructor(props)
     {
         super(props);
-        if(globalLog != null)
+        if(Log.instance)
         {
-            return globalLog;
+            return Log.instance;
         }
-        globalLog = this;
+        Log.instance = this;
         this.msgLimit= 50;
         this.msgRepLimit= 0;
         this.msgQueue = [];
@@ -79,7 +78,7 @@ class Log extends React.Component
 
         this.msgQueue = update(this.msgQueue, {$push: [msg]})
 
-        if(this.mesRef.curren && this.mounted && this.mesRef.current.scrollHeight - this.mesRef.current.scrollTop <= this.mesRef.current.clientHeight+1)
+        if(this.mesRef.current && this.mounted && this.mesRef.current.scrollHeight - this.mesRef.current.scrollTop <= this.mesRef.current.clientHeight+1)
         {
             this.setState({msgQueue: this.msgQueue}, ()=>{
                 this.scrollToBottom();

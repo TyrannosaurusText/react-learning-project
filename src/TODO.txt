@@ -6,7 +6,8 @@ loot! and much more
 
 
 later goals:
-
-todo replace statuseffect bar words with icons.
+crit damage
+potions?
+replace statuseffect bar words with icons.
 
 lets not start ok.

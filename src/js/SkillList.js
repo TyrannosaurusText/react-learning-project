@@ -240,9 +240,8 @@ function addSkill(
 }
 
 export function readTextFile(file, callback) {
-  let isLoaded = false;
   var rawFile = new XMLHttpRequest();
-  rawFile.open("GET", file, false);
+  rawFile.open("GET", file, true);
   rawFile.onreadystatechange = function() {
     if (rawFile.readyState === 4) {
       if (rawFile.status === 200 || rawFile.status === 0) {
@@ -284,7 +283,6 @@ export function readTextFile(file, callback) {
     }
   };
   rawFile.send(null);
-  return isLoaded;
 }
 
 export default { SkillList, readTextFile };

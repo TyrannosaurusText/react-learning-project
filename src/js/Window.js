@@ -1,7 +1,7 @@
 import React from "react";
 import "../css/Window.css";
 import "../css/Battle.css";
-// import Button from 'react-bootstrap/Button'
+import Button from "react-bootstrap/Button";
 // import ButtonToolbar from 'react-bootstrap/ButtonToolbar'
 // import Container from "react-bootstrap/Container";
 // import Row from "react-bootstrap/Row";
@@ -10,19 +10,19 @@ import Log from "./Log.js";
 // import Message from "./Message";
 import Observer from "./Observer";
 // import Stats from "./Stats";
-import { BattleEnemyUI, BattlePlayerUI } from "./BattleUI";
+import { BattleEnemyUI, BattlePlayerUI, BattleInfoWindow } from "./BattleUI";
 
 class Window extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      Battle: true,
+      Battle: false,
       PlayerTarget: 0,
       Enemies: {},
       // Player: new Stats(),
       Party: {},
       enemyUIVisibility: null,
-      turn:"Player"
+      turn: "Player"
     };
 
     Observer.subscribe("BattleStateChange", "Window", update => {
@@ -42,15 +42,16 @@ class Window extends React.Component {
   }
   notifyStateChange(update) {
     if (!this._isMounted) return;
-    Object.keys(update).forEach(element => {  
+    Object.keys(update).forEach(element => {
       if (this.state[element] == null) {
         console.error(element + "is not a valid key!");
         return;
       }
     });
-    if (update["PlayerTarget"]!=null) {
+    if (update["PlayerTarget"] != null) {
       this.updateUIVisibility(update);
     }
+    console.log(update);
     this.setState(update);
   }
 
@@ -89,23 +90,10 @@ class Window extends React.Component {
       <div className="Window">
         <header className="Window-main">
           <div className="Window-main-content">
-            {/* <div>
-              <Button
-                variant="primary"
-                onClick={() => {
-                  this.state.Battle.start();
-                }}
-              >
-                Start
-              </Button>
-            </div> */}
             {this.state.Battle ? (
               <div>
-                
                 <div className="pos">
-                  <div className="battleinfo">
-                  current turn: {this.state.turn}
-                  </div>
+                  <BattleInfoWindow turn={this.state.turn} />
                   <div className="team0">
                     <BattlePlayerUI
                       useSkill={i => this.useSkill(i)}
@@ -126,6 +114,20 @@ class Window extends React.Component {
             <div />
           </div>
           <div className="Window-footer">
+            <div className="btn-group">
+              <Button
+                variant="primary"
+                onClick={() => {
+                  Observer.notify("ActivateFeature", "Battle");
+                }}
+              >
+                Battle
+              </Button>
+              <Button variant="primary"
+                onClick={() => {
+                  Observer.notify("ActivateFeature", "Explore");
+                }}>Explore</Button>
+            </div>
             <Log />
           </div>
         </header>

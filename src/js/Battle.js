@@ -1,6 +1,6 @@
 import Skills from "./Skills";
 import { skillEnum } from "./SkillList";
-import  Observer from "./Observer";
+import Observer from "./Observer";
 import Message from "./Message";
 import Stats from "./Stats";
 import Player from "./Player";
@@ -26,7 +26,20 @@ class Battle {
     this.respawnTime = 3000;
     this.update = {};
     this.turn = -1;
-    Observer.subscribe("BattleActivate", "Battle", val => this.start(val));
+    this.battleEnded = true;
+
+    Observer.subscribe("ActivateFeature", "Battle", val => {
+      if (val === "Battle") {
+        this.featureActive = true;
+        if (this.battleEnded) {
+          this.start();
+        } else {
+          this.continue();
+        }
+      } else {
+        this.stop();
+      }
+    });
     Observer.subscribe("BattlePlayerUseSkill", "Battle", obj => {
       this.notifyPlayerUseSkill(obj);
     });
@@ -60,7 +73,7 @@ class Battle {
         "turns_now",
         this.statusParty[0].get("turns_max")
       );
-     
+
       this.add("Party", this.statusParty);
       this.add("turn", this.turn);
       this.sendUpdate();
@@ -102,18 +115,18 @@ class Battle {
   getState() {
     return this.featureActive;
   }
-  start(val) {
-    this.featureActive = val;
+  start() {
+    if (!this.featureActive) return;
+    // delete this.EnemyAI;
+    // delete this.statusEnemies;
 
-    if (val) {
-      // delete this.EnemyAI;
-      // delete this.statusEnemies;
+    Observer.subscribe("sendPlayerStats", "Battle", stats => {
+      Observer.unsubscribe("sendPlayerStats", "Battle");
       this.statusEnemies = {};
       this.statusParty = {};
-      let statusPlayer = Player.getPlayerStats();
+      let statusPlayer = stats;
       statusPlayer.setBattleStats();
       this.statusParty[0] = statusPlayer;
-
       // let temp = Stats.copy(this.statusPlayer);
 
       let level = statusPlayer.get("level");
@@ -143,7 +156,19 @@ class Battle {
 
       this.EnemyAI = new EnemyPlayer(this.statusEnemies);
       this.sendUpdate();
-    }
+      
+    });
+    Observer.notify("getPlayerStats", null);
+  }
+  continue() {
+    this.featureActive = true;
+    this.add("Battle", true);
+    this.sendUpdate();
+  }
+  stop() {
+    this.featureActive = false;
+    this.add("Battle", false);
+    this.sendUpdate();
   }
 
   notifyPlayerUseSkill(skillName) {
@@ -156,7 +181,7 @@ class Battle {
     }
     let player = this.statusParty[0];
 
-    if(skillName in player.get('cooldownContainer')){
+    if (skillName in player.get("cooldownContainer")) {
       return; //on cooldown
     }
 
@@ -172,7 +197,6 @@ class Battle {
     let result = false;
     if (this.turn === "Player") {
       result = this.useSkill(skillName, player, enemies[target]);
-      
     }
     // console.log(result);
     let turns = player.getval("turns_now");
@@ -180,8 +204,7 @@ class Battle {
       //skill was used
       player.decrement("turns_now");
       let cd = Skills.getSkill(skillName)["cooldown"];
-      if(cd != null)
-      {
+      if (cd != null) {
         player.putOnCooldown(skillName, cd);
       }
 
@@ -245,13 +268,15 @@ class Battle {
       let mp_spent = user
         .get("MP_max")
         .copy()
-        .multiplyBy(skill["MP_Cost"] / 100).round();
-      if(user.get("MP") != null && mp_spent.gt(user.get("MP_now"))) return false;
-      user.get("MP_now").minus(mp_spent); 
+        .multiplyBy(skill["MP_Cost"] / 100)
+        .round();
+      if (user.get("MP") != null && mp_spent.gt(user.get("MP_now")))
+        return false;
+      user.get("MP_now").minus(mp_spent);
       skillInputObj["MP_Spent"] = mp_spent;
     }
 
-    if (skill["SP_Cost"]  && user.get("SP_now")) {
+    if (skill["SP_Cost"] && user.get("SP_now")) {
       let sp_remaining = user
         .get("SP_now")
         .copy()
@@ -268,10 +293,9 @@ class Battle {
     //check skill type then use
     let allAlly = this.turn > 0 ? this.statusParty : this.statusEnemies;
     let allTarget = this.turn > 0 ? this.statusEnemies : this.statusParty;
- 
-    skillResult= skill.onUse(skillLevel, skillInputObj);
-    if(skillResult[skillName])
-      skillName = skillResult[skillName];
+
+    skillResult = skill.onUse(skillLevel, skillInputObj);
+    if (skillResult[skillName]) skillName = skillResult[skillName];
     if (skillResult["self"]) {
       loopSkillResult(skillResult["self"], user, user, 1, skillName);
     }
@@ -279,7 +303,13 @@ class Battle {
       loopSkillResult(skillResult["All"], user, allAlly, bonusMult, skillName);
     }
     if (skillResult["AllEnemy"] || skillResult["All"]) {
-      loopSkillResult(skillResult["All"], user, allTarget, bonusMult, skillName);
+      loopSkillResult(
+        skillResult["All"],
+        user,
+        allTarget,
+        bonusMult,
+        skillName
+      );
     }
     if (skillResult["target"]) {
       loopSkillResult(
@@ -292,7 +322,7 @@ class Battle {
     }
 
     //update statuses
-    
+
     this.add("Party", this.statusParty);
     this.add("Enemies", this.statusEnemies);
     this.sendUpdate();

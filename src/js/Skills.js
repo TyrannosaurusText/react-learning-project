@@ -16,13 +16,13 @@ export function getSkill(skillName)
 
 
 export function fillSkills(...skillName){
-    if (skillName.length < 9)
+    if (skillName.length < 12)
     {
         let obj = {};
         skillName.forEach( (val, index)=>{
             obj[index.toString()] = val;
         });
-        for(var i = skillName.length; i < 9; i++){
+        for(var i = skillName.length; i < 12; i++){
             obj[i.toString()] = "None"
         }
         return obj;
