@@ -1,12 +1,12 @@
 import Skills from "./Skills";
 import { skillEnum } from "./SkillList";
-import Observer from "./Observer";
+import  Observer from "./Observer";
 import Message from "./Message";
 import Stats from "./Stats";
 import Player from "./Player";
 import { MonsterGeneration } from "./MonsterGeneration";
 import { getRndmInteger } from "./random";
-import { toEng } from "./globals";
+import { toEng, ObserverEnum } from "./globals";
 import EnemyPlayer from "./EnemyAI.js";
 import { NumberContainer } from "./numbers";
 
@@ -128,7 +128,7 @@ class Battle {
         temp.set("name", temp.get("name"));
         temp.set("positionIndex", i);
         this.statusEnemies[i] = temp;
-        Observer.notify("LogAddMessage", getSpawnMessage(temp));
+        Observer.notify(ObserverEnum.AddMessage, getSpawnMessage(temp));
       }
       this.turn = "Player"; //player goes first
 
@@ -208,6 +208,7 @@ class Battle {
     // console.log(enemy.get("skillLevels"));
     let isValid = Object.keys(enemy.get("skillLevels")).includes(skillName);
     if (!isValid) {
+      console.log(enemy);
       console.error("enemy does not have skill");
       return;
     }
@@ -243,7 +244,7 @@ class Battle {
       let mp_spent = user
         .get("MP_max")
         .copy()
-        .multiplyBy(skill["MP_Cost"] / 100);
+        .multiplyBy(skill["MP_Cost"] / 100).round();
       
       if(user.get("MP") != null && mp_spent.gt(user.get("MP_now"))) return false;
       user.get("MP_now").minus(mp_spent); 
@@ -268,8 +269,9 @@ class Battle {
     let allAlly = this.turn > 0 ? this.statusParty : this.statusEnemies;
     let allTarget = this.turn > 0 ? this.statusEnemies : this.statusParty;
  
-    [skillResult, skillName] = skill.onUse(skillLevel, skillInputObj);
-
+    skillResult= skill.onUse(skillLevel, skillInputObj);
+    if(skillResult[skillName])
+      skillName = skillResult[skillName];
     if (skillResult["self"]) {
       loopSkillResult(skillResult["self"], user, user, 1, skillName);
     }
@@ -373,7 +375,7 @@ function applySkillResult(
     case "damage":
       let dmgTaken = user.do_damage(target, obj, bonusMult);
       Observer.notify(
-        "LogAddMessage",
+        ObserverEnum.AddMessage,
         new Message(
           damageMessage(
             user.get("name"),
@@ -394,7 +396,7 @@ function applySkillResult(
       break;
   }
   Observer.notify(
-    "LogAddMessage",
+    ObserverEnum.AddMessage,
     new Message(user.get("name") + " used " + skillName + ".")
   );
 }

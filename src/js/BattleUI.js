@@ -22,11 +22,11 @@ function SkillButton(props) {
     Earth: "Success"
   };
   let variant = "secondary";
-  let desc = props.value !== "None" ? skill.desc(props.level) : "None";
   if (skill) variant = color[skill.element];
   // console.log(props.cd);
   if (props.value !== "None") {
     let cost_str = null;
+    let desc = skill.desc(props.level);
     if(skill.MP_Cost || skill.SP_Cost)
     cost_str = (<div>Costs: {(skill.SP_Cost ? skill.SP_Cost + " SP" : "")} {(skill.MP_Cost?skill.MP_Cost + "% MP" : "")}</div>)
     return (
@@ -35,7 +35,7 @@ function SkillButton(props) {
         arrowProps={{fontSize:"10px"}}
         overlay={
           <Tooltip className="my-tooltip"  >
-            {props.value}
+            {props.value + " lvl "+props.level}
             {skill.type?<div>{skill.type}</div> :""}
             {skill.distance?<div>{skill.distance}</div> :""}
             {cost_str?(<div>{cost_str}</div>) : ""}
@@ -50,7 +50,7 @@ function SkillButton(props) {
             props.onClick();
           }}
         >
-          {props.value}
+          {props.value + (props.onCD ? " (" + props.onCD + ")" : "")}
         </Button>
       </OverlayTrigger>
     );
@@ -79,7 +79,7 @@ export class BattlePlayerUI extends React.Component {
     if (!equippedSkills) return null;
     return (
       <SkillButton
-        value={skillName + (cd ? " (" + cd + ")" : "")}
+        value={skillName}
         stats={this.props.PlayerStats}
         onCD={cd}
         level={statusSheet.getSkillLevel(skillName)}

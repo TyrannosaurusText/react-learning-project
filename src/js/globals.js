@@ -44,4 +44,7 @@ export function toEng(val)
       return v+"e"+e;
     return e;
 }
+export const ObserverEnum= {
+  AddMessage: "LogAddMessage" 
+};
 export default {tupleWord};

@@ -1,4 +1,5 @@
 import Observer from "./Observer";
+import { ObserverEnum } from "./globals";
 import Message from "./Message";
 import { NumberContainer, constNumberContainer } from "./numbers";
 class Stats {
@@ -32,7 +33,7 @@ class Stats {
       Observer.subscribe("BattleSkillUseEnd", this.get("name"), message => {
         Observer.unsubscribe("BattleSkillUseEnd", this.get("name"));
         Observer.notify(
-          "LogAddMessage",
+          ObserverEnum.AddMessage,
           new Message(this.get("name") + " was defeated.")
         );
         let event = "";
@@ -141,7 +142,7 @@ class Stats {
       );
       this.set(element + "_mult", new NumberContainer(1));
     });
-    if (this.container["charge"]!=null) {
+    if (this.container["charge"] != null) {
       this.set("charge_now", new NumberContainer(0));
       this.set("charge_max", new NumberContainer(this.getval("charge")));
       this.set("no_charge_attack", new NumberContainer(0));
@@ -153,29 +154,32 @@ class Stats {
    * key = atk, def, mp, sp etc.
    * val = number
    */
-  addBuff(buff, buff_stat, val) {
+  addBuff(buff) {
     let buffContainer = this.get("buffContainer");
-    if (buff.name in buffContainer) { //dont change this 'in' operator
+    if (buff.name in buffContainer) {
+      //dont change this 'in' operator
       //buff already applied, reapply the buff,
       //if it is better increase the value
       //if the duration is longer, reset the duration.
       buff.reapply(this, buff);
     } else {
-      this.handleBuff(buff_stat, val);
+      // this.handleBuff(buff_stat, val);
       buffContainer[buff.name] = buff;
     }
   }
 
-  removeBuff(buff, key, val) {
+  removeBuff(buff) {
     let buffContainer = this.get("buffContainer");
-    if (buff.name in buffContainer) { //dont change this 'in' operator
-      this.handleBuff(key, -1 * val);
+    if (buff.name in buffContainer) {
+      //dont change this 'in' operator
+      // this.handleBuff(key, -1 * val);
       delete buffContainer[buff.name];
     }
     //else do nothing
   }
 
   handleBuff(buff_stat, val) {
+    if (this.get(buff_stat) == null) return;
     let buff_mult = buff_stat + "_mult";
     let buff_max = buff_stat + "_max";
     let buff_now = buff_stat + "_now";
@@ -183,7 +187,7 @@ class Stats {
     let new_max_val = this.get(buff_stat)
       .copy()
       .multiplyBy(this.get(buff_mult))
-      .round();
+      .ceil();
     let percentChange = new_max_val.copy().divideBy(this.get(buff_max));
     this.set(buff_max, new_max_val);
     this.get(buff_now)
@@ -191,11 +195,55 @@ class Stats {
       .round();
   }
 
+  handleDoT(name, buff_stat, val, isPercent) {
+    let buff_max = buff_stat + "_max";
+    let buff_now = buff_stat + "_now";
+    let gainOrLoss = new NumberContainer(val);
+    console.log(gainOrLoss);
+    console.log(buff_now);
+    if (isPercent) {
+      val = val / 100;
+      gainOrLoss = this.get(buff_max)
+        .copy()
+        .multiplyBy(val)
+        .round();
+    }
+    this.get(buff_now)
+      .plus(gainOrLoss)
+      .round();
+
+    Observer.notify(
+      ObserverEnum.AddMessage,
+      new Message(
+        this.get("name") +
+          " is " +
+          name +
+          " and " +
+          (gainOrLoss > 0 ? "gained " : "lost ") +
+          gainOrLoss.val +
+          " " +
+          buff_stat +
+          "."
+      )
+    );
+
+    if (buff_stat === "hp" && this.get(buff_now).lte(0)) {
+      Observer.notify(ObserverEnum.AddMessage, new Message(this.get("name") + " was defeated."))
+      let event =""
+      if (this.get("isPlayer")) {
+        event = "BattlePlayerDefeated";
+      } else {
+        event = "BattleEnemyDefeated";
+      }
+      Observer.notify(event, this.get("positionIndex"));
+    }
+  }
+
   decrementBuffDurations() {
     // console.log("enter")
     let buffContainer = this.get("buffContainer");
     Object.keys(buffContainer).forEach(element => {
-      let expirationCheck = buffContainer[element].decrement();
+      let expirationCheck = buffContainer[element].decrement(this);
       if (expirationCheck) {
         buffContainer[element].removeFrom(this);
       }
@@ -203,8 +251,8 @@ class Stats {
     });
   }
 
-  putOnCooldown(skillName, cd){
-    this.get('cooldownContainer')[skillName] = cd;
+  putOnCooldown(skillName, cd) {
+    this.get("cooldownContainer")[skillName] = cd;
   }
 
   decrementSkillCooldown() {

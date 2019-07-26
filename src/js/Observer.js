@@ -31,7 +31,7 @@ class SuperObserver{
 }
 
 //observer class
-class Observer{
+export class Observer{
     constructor(name)
     {
 

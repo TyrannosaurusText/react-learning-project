@@ -1,7 +1,8 @@
 import { getRndmInteger } from "./random";
 import { tupleWord } from "./globals";
 import { NumberContainer } from "./numbers";
-import { Buff, Debuff } from "./Buff";
+import { Buff, Debuff, DoT, Regen } from "./Buff";
+import Papa from "papaparse";
 // import Observer from "./Observer";
 
 export const skillEnum = {
@@ -16,14 +17,6 @@ export const skillEnum = {
 
 export let SkillList = {
   Strike: {
-    name: skillEnum.Strike,
-    type: "Active",
-    distance: "Melee",
-    SP_Cost: 10,
-    element: "Physical",
-    upgrade_type: "SkillPoint",
-    cost_mult: 10,
-    targets: 1,
     desc: skillLevel => {
       return (
         "Deal " +
@@ -47,22 +40,14 @@ export let SkillList = {
         "damage",
         damage(1 + 0.001 * skillLevel, 0, rand)
       );
-      return [returnObj, skillName];
+      returnObj = modifySkillName(returnObj, skillName);
+      return returnObj;
       // return returnObj;
     }
   },
   Firebolt: {
-    name: skillEnum.Firebolt,
-    type: "Active",
-    distance:"Ranged",
-    MP_Cost: 5,
-    element: "Fire",
-    upgrade_type: "SkillPoint",
-    cost_mult: 10,
     desc: skillLevel => {
-      return (
-        "Shoot a firebolt towards the enemy, dealing damage based on mana consuumed."
-      );
+      return "Shoot a firebolt towards the enemy, dealing damage based on mana consuumed.";
     },
     onUse: (skillLevel = 1, mp_consumed) => {
       let mp = checkMP(mp_consumed, 5);
@@ -72,19 +57,16 @@ export let SkillList = {
         "damage",
         damage(1, mp.multiplyBy(1 + 0.02 * skillLevel))
       );
-      return [returnObj, skillEnum.Firebolt];
+      let debuffobj = statusEffect(
+        new DoT("Burn", 5, { hp: 5 * skillLevel }, "burned", false)
+      );
+
+      returnObj = returnObjectAppend(returnObj, "target", "debuff", debuffobj);
+      return returnObj;
     },
     targets: 1
   },
   "Flame Strike": {
-    name: skillEnum.FlameStrike,
-    type: "Active",
-    distance:"Melee",
-    MP_Cost: 50,
-    SP_Cost: 20,
-    element: "Fire",
-    upgrade_type: "SkillPoint",
-    cost_mult: 50,
     desc: skillLevel => {
       return (
         "Deals " +
@@ -106,19 +88,15 @@ export let SkillList = {
         damage(1, mp.multiplyBy(1 + 0.2 * skillLevel), rand)
       );
       let skillName = tupleWord(rand) + skillEnum.FlameStrike;
-      return [returnObj, skillName];
+
+      returnObj = modifySkillName(returnObj, skillName);
+      return returnObj;
     },
     targets: 1
   },
   "SP Mastery": {
-    name: skillEnum.SPMastery,
-    type: "Passive",
-    upgrade_type: "SkillPoint",
-    cost_mult: 10,
     desc: skillLevel => {
-      return (
-        "The ability to utilize SP, increases damage using SP skills."
-      );
+      return "The ability to utilize SP, increases damage using SP skills.";
     },
     onUse: (skillLevel = 1, sp_remaining = new NumberContainer(0)) => {
       if (skillLevel == null) return 1;
@@ -127,9 +105,6 @@ export let SkillList = {
     }
   },
   "Full Charge": {
-    name: skillEnum.FullCharge,
-    type: "Recovery",
-    target: "self",
     desc: skillLevel => {
       return (
         "Strike\n Deals " +
@@ -146,59 +121,40 @@ export let SkillList = {
         key: "charge",
         val: 100
       });
-      return [returnObj, skillEnum.FullCharge];
+      return returnObj;
     }
   },
   "ATK Up": {
-    name: skillEnum.ATKUP,
-    type: "Buff",
-    duration: 4,
-    cooldown: 10,
-    target: "self",
-    upgrade_type: "SkillPoint",
-    cost_mult: 10,
     desc: skillLevel => {
-      return (
-        "Increases your ATK by " + (20+.2*skillLevel) +"%" 
-      );
+      return "Increases your ATK by " + (20 + 0.2 * skillLevel) + "%";
     },
-    onUse: (skillLevel = 1, user) => {
-      if (user === null) return null;
-      let obj = {
-        statusEffect: new Buff(skillEnum.ATKUP, 4, {
+    onUse: (skillLevel = 1) => {
+      let buff = statusEffect(
+        new Buff(skillEnum.ATKUP, 4, {
           atk: 20 + 0.2 * skillLevel
         })
-      };
+      );
       // return obj;
-      let returnObj = returnObjectAppend({}, "self", "buff", obj);
+      let returnObj = returnObjectAppend({}, "self", "buff", buff);
 
-      return [returnObj, skillEnum.ATKUP];
+      return returnObj;
     }
   },
   "ATK Down": {
-    name: skillEnum.ATKUP,
-    type: "Debuff",
-    duration: 4,
-    cooldown: 10,
-    target: "single",
-    upgrade_type: "SkillPoint",
-    cost_mult: 10,
     desc: skillLevel => {
-      return (
-        "Decreases target's ATK by " + (20+.2*skillLevel) +"%" 
-      );
+      return "Decreases target's ATK by " + (20 + 0.2 * skillLevel) + "%";
     },
-    onUse: (skillLevel = 1, user) => {
-      if (user === null) return null;
-
-      let obj = {
-        statusEffect: new Debuff(skillEnum.ATKDOWN, 4, {
+    onUse: (skillLevel = 1) => {
+      let debuff = statusEffect(
+        new Debuff(skillEnum.ATKDOWN, 4, {
           atk: 20 + 0.2 * skillLevel
         })
-      };
+      );
+
       // return obj;
-      let returnObj = returnObjectAppend({}, "target", "debuff", obj);
-      return [returnObj, skillEnum.ATKDOWN];
+      let returnObj = returnObjectAppend({}, "target", "debuff", debuff);
+
+      return returnObj;
     }
   }
 };
@@ -209,7 +165,6 @@ function checkMP(obj, default_cost) {
   }
   return obj["MP_Spent"];
 }
-export default { SkillList };
 
 function returnObjectAppend(returnObject, target, key, val) {
   let obj = returnObject[target];
@@ -224,3 +179,95 @@ function returnObjectAppend(returnObject, target, key, val) {
 function damage(mult = 1, flat = 0, hit = 1) {
   return { damageMult: mult, damageFlat: flat, hitCount: hit };
 }
+
+function statusEffect(buffclassobj) {
+  return { statusEffect: buffclassobj };
+}
+function modifySkillName(returnObj, name) {
+  returnObj["skillName"] = name;
+  return returnObj;
+}
+
+function addSkill(
+  name,
+  type,
+  distance,
+  element,
+  SP_Cost,
+  MP_Cost,
+  upgrade_type,
+  upgrade_cost_mult,
+  target,
+  duration,
+  cooldown,
+  can_crit,
+  critrate,
+  restriction
+) {
+  let new_skill = SkillList[name];
+  new_skill.name = name;
+  new_skill.distance = distance;
+  new_skill.type = type;
+  new_skill.element = element;
+  new_skill.SP_Cost = SP_Cost;
+  new_skill.MP_Cost = MP_Cost;
+  new_skill.upgrade_type = upgrade_type;
+  new_skill.upgrade_cost_mult = upgrade_cost_mult;
+  new_skill.target = target;
+  new_skill.duration = duration;
+  new_skill.cooldown = cooldown;
+  new_skill.can_crit = can_crit;
+  new_skill.critrate = critrate;
+  new_skill.restriction = restriction;
+
+}
+
+export function readTextFile(file, callback) {
+  let isLoaded = false;
+  var rawFile = new XMLHttpRequest();
+  rawFile.open("GET", file, false);
+  rawFile.onreadystatechange = function() {
+    if (rawFile.readyState === 4) {
+      if (rawFile.status === 200 || rawFile.status == 0) {
+        var allText = rawFile.responseText;
+
+        Papa.parse(allText, {
+          header: true,
+          worker: true,
+          dynamicTyping: true,
+          skipEmptyLines: "greedy",
+          complete: data => {
+            // console.log(data.data);
+            let keys = Object.keys(data.data);
+            for (var i = 0; i < data.data.length; i++) {
+              // .map(element => {
+              let obj = data.data[keys[i]];
+              addSkill(
+                obj.name,
+                obj.type,
+                obj.distance,
+                obj.element,
+                obj.SP_Cost,
+                obj.MP_Cost,
+                obj.upgrade_type,
+                obj.upgrade_cost_mult,
+                obj.target,
+                obj.duration,
+                obj.cooldown,
+                obj.can_crit,
+                obj.critrate,
+                obj.restriction
+              );
+              // });
+            }
+            callback()
+          }
+        });
+      }
+    }
+  };
+  rawFile.send(null);
+  return isLoaded;
+}
+
+export default { SkillList, readTextFile };

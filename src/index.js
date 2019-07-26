@@ -8,6 +8,9 @@ import Player from "./js/Player";
 import {newJobReincarnator} from "./js/globals";
 // import Stats from "./js/Stats"
 import Skills from "./js/Skills";
+import {readTextFile} from "./js/SkillList"
+import file from "./skills.csv";
+
 // import character from './Combat'
 // import './globals'
 
@@ -17,7 +20,6 @@ import Skills from "./js/Skills";
 class Game extends React.Component {
   constructor(props) {
     super(props);
-
     let stats = newJobReincarnator.copy(); //deep clone
     let skills = Skills.fillSkills("Strike", "Flame Strike", "ATK Up", "ATK Down", "Firebolt");
     stats.set("equippedSkills", skills);
@@ -35,4 +37,8 @@ class Game extends React.Component {
     return <Window />;
   }
 }
+
+readTextFile(file, ()=>{
+
 ReactDOM.render(<Game />, document.getElementById("root"));
+});

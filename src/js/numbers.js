@@ -47,6 +47,10 @@ export class NumberContainer {
       this.val = Math.trunc(this.val);
       return this;
   }
+  ceil(){
+    this.val = Math.ceil(this.val);
+    return this;
+  }
   plus(rhs) {
     if (rhs instanceof NumberContainer) this.val += rhs.val;
     else this.val += rhs;

@@ -1,0 +1,8 @@
+name,type,distance,element,SP_Cost,MP_Cost,upgrade_type,upgrade_cost_mult,target,duration,cooldown,can_crit,critrate,restriction
+Strike,Active,Melee,Physical,10,,Skill Point,10,1,,,TRUE,1,
+Firebolt,Active,Ranged,Fire,,5,Skill Point,10,1,,,TRUE,1,
+Flame Strike,Active,Melee,Fire,20,50,Skill Point,50,1,,,TRUE,1,
+ATK Up,Buff,,,,,Skill Point,20,1,4,10,FALSE,,
+ATK Down,Debuff,,,,,Skill Point,20,1,4,10,FALSE,,
+SP Mastery,Passive,,,,,Skill Point,20,,,,,,
+Full Charge,Active,,,,,,,,,,,,Monster
