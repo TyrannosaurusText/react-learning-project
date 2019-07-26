@@ -156,6 +156,22 @@ export let SkillList = {
 
       return returnObj;
     }
+  },
+  "Regen":{
+    desc: skillLevel => {
+      return "Regenerate " + (50 +10* skillLevel) + "% of your health every turn.";
+    },
+    onUse: (skillLevel = 1) => {
+      let buff = statusEffect(
+        new Regen(skillEnum.Regen, 20, {
+          hp: 50 + 10 * skillLevel
+        }, false)
+      );
+      // return obj;
+      let returnObj = returnObjectAppend({}, "self", "buff", buff);
+
+      return returnObj;
+    }
   }
 };
 
@@ -228,7 +244,7 @@ export function readTextFile(file, callback) {
   rawFile.open("GET", file, false);
   rawFile.onreadystatechange = function() {
     if (rawFile.readyState === 4) {
-      if (rawFile.status === 200 || rawFile.status == 0) {
+      if (rawFile.status === 200 || rawFile.status === 0) {
         var allText = rawFile.responseText;
 
         Papa.parse(allText, {

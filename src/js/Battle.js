@@ -42,8 +42,8 @@ class Battle {
     });
     Observer.subscribe("BattlePlayerDefeated", "Battle", () => {
       // holding this off so that testing is easier.
-      // this.battleEnded = true;
-      // setTimeout(() => this.start(true), this.respawnTime);
+      this.battleEnded = true;
+      setTimeout(() => this.start(true), this.respawnTime);
     });
     Observer.subscribe("BattleEnemyDefeated", "Battle", EnemiesIndex => {
       this.onEnemyDefeated(EnemiesIndex);
@@ -209,6 +209,7 @@ class Battle {
     let isValid = Object.keys(enemy.get("skillLevels")).includes(skillName);
     if (!isValid) {
       console.log(enemy);
+      console.log(skillName);
       console.error("enemy does not have skill");
       return;
     }
@@ -307,11 +308,11 @@ function getSpawnMessage(temp) {
       " " +
       temp.get("name") +
       " appeared. (" +
-      toEng(temp.get("hp")) +
+      toEng(temp.getval("hp")) +
       ", " +
-      toEng(temp.get("atk")) +
+      toEng(temp.getval("atk")) +
       ", " +
-      toEng(temp.get("def")) +
+      toEng(temp.getval("def")) +
       ")"
   );
 }

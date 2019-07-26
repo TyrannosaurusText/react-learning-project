@@ -32,7 +32,7 @@ class Stats {
         .round();
     }
     // Math.round(hitCount * (damage - this.get("def_now").val));
-    if (dmgTaken.gt(this.get("hp_now"))) {
+    if (dmgTaken.gte(this.get("hp_now"))) {
       this.get("hp_now").set(0);
       Observer.subscribe("BattleSkillUseEnd", this.get("name"), message => {
         Observer.unsubscribe("BattleSkillUseEnd", this.get("name"));

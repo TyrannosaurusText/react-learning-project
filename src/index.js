@@ -5,11 +5,12 @@ import Window from "./js/Window";
 import "./css/bootstrap.css";
 import Battle from "./js/Battle";
 import Player from "./js/Player";
-import {newJobReincarnator} from "./js/globals";
+import { newJobReincarnator } from "./js/globals";
 // import Stats from "./js/Stats"
 import Skills from "./js/Skills";
-import {readTextFile} from "./js/SkillList"
+import { readTextFile } from "./js/SkillList";
 import file from "./skills.csv";
+import Log from "./js/Log";
 
 // import character from './Combat'
 // import './globals'
@@ -21,15 +22,20 @@ class Game extends React.Component {
   constructor(props) {
     super(props);
     let stats = newJobReincarnator.copy(); //deep clone
-    let skills = Skills.fillSkills("Strike", "Flame Strike", "ATK Up", "ATK Down", "Firebolt");
+    let skills = Skills.fillSkills(
+      "Strike",
+      "Flame Strike",
+      "ATK Up",
+      "ATK Down",
+      "Firebolt"
+    );
     stats.set("equippedSkills", skills);
+    this.Log = new Log();//create log before battle
+  
     this.player = new Player(stats);
 
     this.battle = new Battle();
-
   }
-
-  // }
 
   render() {
     // let i = new init();
@@ -38,7 +44,6 @@ class Game extends React.Component {
   }
 }
 
-readTextFile(file, ()=>{
-
-ReactDOM.render(<Game />, document.getElementById("root"));
+readTextFile(file, () => {
+  ReactDOM.render(<Game />, document.getElementById("root"));
 });

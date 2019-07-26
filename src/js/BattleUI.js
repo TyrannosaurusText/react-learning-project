@@ -31,10 +31,11 @@ function SkillButton(props) {
     cost_str = (<div>Costs: {(skill.SP_Cost ? skill.SP_Cost + " SP" : "")} {(skill.MP_Cost?skill.MP_Cost + "% MP" : "")}</div>)
     return (
       <OverlayTrigger
+        trigger="hover"
         placement="bottom"
         arrowProps={{fontSize:"10px"}}
         overlay={
-          <Tooltip className="my-tooltip"  >
+          <Tooltip className="my-tooltip" >
             {props.value + " lvl "+props.level}
             {skill.type?<div>{skill.type}</div> :""}
             {skill.distance?<div>{skill.distance}</div> :""}
@@ -45,7 +46,7 @@ function SkillButton(props) {
       >
         <Button
           variant={variant}
-          disabled={props.onCD > 0}
+          // disabled={props.onCD > 0} //dont disable b/c bug
           onClick={() => {
             props.onClick();
           }}

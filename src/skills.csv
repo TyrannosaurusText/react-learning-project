@@ -6,3 +6,4 @@ ATK Up,Buff,,,,,Skill Point,20,1,4,10,FALSE,,
 ATK Down,Debuff,,,,,Skill Point,20,1,4,10,FALSE,,
 SP Mastery,Passive,,,,,Skill Point,20,,,,,,
 Full Charge,Active,,,,,,,,,,,,Monster
+Regen,Buff,,Light,,5,Skill Point,20,1,20,20,FALSE,,
