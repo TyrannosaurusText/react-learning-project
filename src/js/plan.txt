@@ -1,0 +1,34 @@
+stats:
+str (increases atk, max SP),
+int (increases mana, ability to use skills),
+dex (crit rate, sp regen)
+wis (mana regen)
+luk (crit rate, drop rate)
+const (max hp, def)
+
+inventory/equipment system draft
+1~3 equip slots to start more later
+equipment = crystals
+weapon,armor,etc are all crystals.
+inventory storage limit 50, upgradable 
+
+
+equipment
+crystals have: atk/hp/def, stats and element specific boosts
+crystals will be offensive/defensive
+crystals upgrades: 
+enhancement (multiplicative upgrade, resource upgrade +1,+2,+3...), incremental/rng S 
+rarity (level cap), rarity upgrades = exponential merging, + infusion (level by feeding gear/exp, increases atk,def,hp), incremental + rng S 
+stat grades (i.e. atk A rank def F rank, increases stat gain), stat grade leveling (rng) A
+special bonuses (+turns, life steal?, block/dodge chance, regen, elemental damage ,and crappy bonuses +hp...) (rng) S
+coin flipping upgrades (minor culminlative atk/hp/def upgrade, downgrade if fail) (rng) C
+element boost small but grows (5% + log(x)%) (incremental) B
+proficency upgrades (atk/hp/def/stats, growth over usage log), (incremental) C
+
+crit damage upgrade (rng + destructive) S
+flat damage upgrade (rng + destructive) B
+
+
+summons?
+offensive/defensive/supportive/disruptive allies
+boosts hp/shared hp, dies at hp % (75, 50, 25)
