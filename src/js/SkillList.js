@@ -59,7 +59,7 @@ export let SkillList = {
         damage(1, mp.multiplyBy(1 + 0.02 * skillLevel))
       );
       let debuffobj = statusEffect(
-        new DoT("Burn", 5, { hp: 5 * skillLevel }, "burned", false)
+        new DoT("Burn", 5, { HP: 5 * skillLevel }, "burned", false)
       );
 
       returnObj = returnObjectAppend(returnObj, "target", "debuff", debuffobj);
@@ -165,7 +165,7 @@ export let SkillList = {
     onUse: (skillLevel = 1) => {
       let buff = statusEffect(
         new Regen(skillEnum.Regen, 20, {
-          hp: 50 + 10 * skillLevel
+          HP: 50 + 10 * skillLevel
         }, "regenerated",false)
       );
       // return obj;
@@ -253,10 +253,8 @@ export function readTextFile(file, callback) {
           dynamicTyping: true,
           skipEmptyLines: "greedy",
           complete: data => {
-            // console.log(data.data);
             let keys = Object.keys(data.data);
             for (var i = 0; i < data.data.length; i++) {
-              // .map(element => {
               let obj = data.data[keys[i]];
               addSkill(
                 obj.name,

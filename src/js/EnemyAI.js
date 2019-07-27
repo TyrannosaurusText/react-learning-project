@@ -36,7 +36,7 @@ class EnemyAI {
   }
   getNext(stats) {
     let trigger = this.ai.trigger;
-    let hp_percent = 100*stats.getval("hp_now") / stats.getval("hp");
+    let HP_percent = 100*stats.getval("HP_now") / stats.getval("HP");
     let skillName = "";
 
     let keys = Object.keys(trigger);
@@ -44,10 +44,9 @@ class EnemyAI {
       let key = keys[i];
       let obj = trigger[key];
       if (
-        hp_percent <= parseInt(key) &&
+        HP_percent <= parseInt(key) &&
         this.trigger_index <= obj.trigger_index
       ) {
-        // console.log("trigger");
         skillName = obj.skillName;
         let turn = obj.uses_turn;
         this.trigger_index = obj.trigger_index + 1;
@@ -57,12 +56,7 @@ class EnemyAI {
       }
     }
     let chargeAttack = this.ai.chargeAttack;
-    // console.log(
-    //   stats,
-    //   stats.contains("charge_now"),
-    //   stats.getval("charge_now") >= stats.getval("charge_max"),
-    //   stats.getval("no_charge_attack") === 0
-    // );
+
     if (
       stats.contains("charge_now") &&
       stats.getval("charge_now") === stats.getval("charge_max") &&
@@ -70,7 +64,7 @@ class EnemyAI {
     ) {
       stats.set("charge_now", 0);
       return this.loop(
-        hp_percent,
+        HP_percent,
         chargeAttack,
         this.charge_index,
         this.charge_prev
@@ -78,23 +72,21 @@ class EnemyAI {
 
     }
     let strat = this.ai.strat;
-    // console.log(stats.getval("charge_now"));
     stats.increment("charge_now");
     if (stats.getval("no_charge_attack")) {
       stats.decrement("no_charge_attack");
     }
-    return this.loop(hp_percent, strat, this.strat_index, this.strat_prev);
+    return this.loop(HP_percent, strat, this.strat_index, this.strat_prev);
 
   }
 
-  loop(hp_percent, object, index, prev) {
+  loop(HP_percent, object, index, prev) {
     let skillName = "";
     let keys = Object.keys(object);
     for (var i = 0; i < keys.length; i++) {
       let key = keys[i];
       let obj = object[key];
-      // console.log(key, hp_percent)
-      if (hp_percent <= parseInt(key)) {
+      if (HP_percent <= parseInt(key)) {
         
         if (index === prev) {
           index = this.increment(index, obj.length);
@@ -119,6 +111,7 @@ export class EnemyPlayer {
   constructor(party) {
     this.enemyParty = party;
     this.enemyAI = {};
+    this.willExit = false;
     Object.keys(this.enemyParty).forEach(key => {
       let enemy = this.enemyParty[key];
       let ai = enemy.getval("AI");
@@ -133,6 +126,9 @@ export class EnemyPlayer {
     Observer.subscribe("BattleEnemyTurn", "EnemyAI", () => {
       this.notifyOnEnemyTurn();
     });
+    Observer.subscribe("BattlePlayerDefeated", "EnemyAI", ()=>{
+      this.willExit = true;
+    })
   }
 
   async notifyOnEnemyTurn() {
@@ -145,9 +141,8 @@ export class EnemyPlayer {
       let index = enemy.getval("positionIndex");
 
       while (this.turns_now.gt(0)) {
-        // console.log(this.turns_now)
+        if(this.willExit) return;
         let skillName = this.enemyAI[index].getNext(enemy);
-        // console.log("skill: ", skillName);
         let update = {};
         update["skillName"] = skillName;
         update["index"] = index;

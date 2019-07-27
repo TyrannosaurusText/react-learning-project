@@ -32,8 +32,8 @@ class Stats {
         .round();
     }
     // Math.round(hitCount * (damage - this.get("def_now").val));
-    if (dmgTaken.gte(this.get("hp_now"))) {
-      this.get("hp_now").set(0);
+    if (dmgTaken.gte(this.get("HP_now"))) {
+      this.get("HP_now").set(0);
       Observer.subscribe("BattleSkillUseEnd", this.get("name"), message => {
         Observer.unsubscribe("BattleSkillUseEnd", this.get("name"));
         Observer.notify(
@@ -49,7 +49,7 @@ class Stats {
         Observer.notify(event, this.get("positionIndex"));
       });
     } else {
-      this.set("hp_now", this.get("hp_now").minus(dmgTaken));
+      this.set("HP_now", this.get("HP_now").minus(dmgTaken));
     }
 
     return dmgTaken;
@@ -102,7 +102,7 @@ class Stats {
   // static verifyObj(obj) {
   //   let keys = [
   //     "name",
-  //     "hp",
+  //     "HP",
   //     "level",
   //     "atk",
   //     "def",
@@ -126,13 +126,26 @@ class Stats {
         );
       }
     });
-    // console.log(copyStats);
 
     return copyStats;
   }
+  calcStats() {
+    let vals = ["HP", "atk", "def", "SP", "MP", "turns"];
+    vals.forEach(element => {
+      console.log(element)
+      this.set(
+        element,
+        new NumberContainer(0).plus(this.getval(element + "_base"))
+        //add gear
+      );
+      console.log(this.getval(element));
+    });
+  }
   setBattleStats() {
-    //TODO: probably add equipment effects + multipliers here.
-    let vals = ["hp", "atk", "def", "SP", "MP", "turns"];
+    if(this.get("isPlayer"))
+    this.calcStats()
+    //TODO: probably add equipment effects + multipliers before entering here.
+    let vals = ["HP", "atk", "def", "SP", "MP", "turns"];
     vals.forEach(element => {
       // console.log(this.getval(element));
       let val = this.getval(element);
@@ -145,6 +158,9 @@ class Stats {
       this.set("charge_max", new NumberContainer(this.getval("charge")));
       this.set("no_charge_attack", new NumberContainer(0));
     }
+
+    this.set("buffContainer", {});
+    this.set("cooldownContainer", {});
     this.set("targetIndex", 0);
   }
 
@@ -205,7 +221,8 @@ class Stats {
         .round();
     }
     this.get(buff_now)
-      .plus(gainOrLoss).min(this.get(buff_max).copy())
+      .plus(gainOrLoss)
+      .min(this.get(buff_max).copy())
       .round();
 
     Observer.notify(
@@ -213,17 +230,19 @@ class Stats {
       new Message(
         this.get("name") +
           " is " +
-          name + (gainOrLoss.eq(0)?", but nothing happened.":
-          " and " +
-          (gainOrLoss.gt(0) ? "gained " : "lost ") +
-          gainOrLoss.val +
-          " " +
-          buff_stat) +
+          name +
+          (gainOrLoss.eq(0)
+            ? ", but nothing happened."
+            : " and " +
+              (gainOrLoss.gt(0) ? "gained " : "lost ") +
+              gainOrLoss.val +
+              " " +
+              buff_stat) +
           "."
       )
     );
 
-    if (buff_stat === "hp" && this.get(buff_now).lte(0)) {
+    if (buff_stat === "HP" && this.get(buff_now).lte(0)) {
       Observer.notify(
         ObserverEnum.AddMessage,
         new Message(this.get("name") + " was defeated.")
@@ -264,13 +283,13 @@ class Stats {
     });
   }
 
-  setMobStats(mob, level, rarity, hp, atk, def) {
+  setMobStats(mob, level, rarity, HP, atk, def) {
     if (this.isPlayer) return;
     this.set("name", rarity + mob.name);
     this.set("level", Math.max(mob.minLevel, level));
     this.set("rarity", rarity);
-    // console.log(hp, atk, def, mob.turns, mob.charge)
-    this.set("hp", hp);
+    // console.log(HP, atk, def, mob.turns, mob.charge)
+    this.set("HP", HP);
     this.set("atk", atk);
     this.set("def", def);
     this.set("skillLevels", mob.skillLevels(level));

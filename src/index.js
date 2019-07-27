@@ -5,7 +5,7 @@ import Window from "./js/Window";
 import "./css/bootstrap.css";
 import Battle from "./js/Battle";
 import Player from "./js/Player";
-import { newJobReincarnator } from "./js/globals";
+import { newPlayer } from "./js/globals";
 // import Stats from "./js/Stats"
 import Skills from "./js/Skills";
 import { readTextFile } from "./js/SkillList";
@@ -21,7 +21,7 @@ import Log from "./js/Log";
 class Game extends React.Component {
   constructor(props) {
     super(props);
-    let stats = newJobReincarnator.copy(); //deep clone
+    let stats = newPlayer.copy(); //deep clone
     let skills = Skills.fillSkills(
       "Strike",
       "Flame Strike",

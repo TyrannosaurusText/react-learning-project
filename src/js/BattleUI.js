@@ -40,7 +40,6 @@ function SkillButtons(props) {
   };
   let variant = "secondary";
   if (skill) variant = color[skill.element];
-  // console.log(props.cd);
   if (props.value !== "None") {
     let cost_str = null;
     let desc = skill.desc(props.level);
@@ -94,7 +93,6 @@ export class BattlePlayerUI extends React.Component {
     const cdc = this.props.PlayerStats.get("cooldownContainer");
     let skillName = equippedSkills[i];
     const cd = cdc[skillName];
-    // console.log(cdc)
     if (!equippedSkills) return null;
     return (
       <div className="btn-group">
@@ -239,9 +237,9 @@ export class BattleEnemyUI extends React.Component {
 function miniEnemyDisplay(props) {
   if (props == null) return;
   let percent = props
-    .get("hp_now")
+    .get("HP_now")
     .copy()
-    .divideBy(props.get("hp_max"))
+    .divideBy(props.get("HP_max"))
     .multiplyBy(100).val;
   let hppercent =
     Math.min(100, percent)
@@ -264,7 +262,7 @@ function miniEnemyDisplay(props) {
       <div className="miniHPBar" style={{ width: hppercent }}>
         {props.getval("name") +
           " HP:" +
-          toEng(props.getval("hp_now")) +
+          toEng(props.getval("HP_now")) +
           " level: " +
           toEng(props.getval("level")) +
           " ATK: " +
@@ -287,8 +285,8 @@ function NameHPWindow(props) {
       <Col className="window-border">
         <NameHP
           name={props.statusSheet.getval("name")}
-          hp_now={props.statusSheet.getval("hp_now")}
-          hp={props.statusSheet.getval("hp_max")}
+          HP_now={props.statusSheet.getval("HP_now")}
+          HP={props.statusSheet.getval("HP_max")}
         />
       </Col>
     </Row>
@@ -356,14 +354,14 @@ function ThreeBoxResource(props) {
 
 function NameHP(props) {
   let hppercent =
-    Math.min(100, (100 * (props.hp_now / props.hp)).toFixed(1)).toString() +
+    Math.min(100, (100 * (props.HP_now / props.HP)).toFixed(1)).toString() +
     "%";
   return (
     <div style={{ height: "100%" }}>
       <div className="statwin-namehp">
         <div className="namehp" style={{ width: hppercent }}>
           {/* <div className="HPBar"> */}
-          {props.name} HP: {toEng(props.hp_now)}
+          {props.name} HP: {toEng(props.HP_now)}
           {/* </div> */}
         </div>
       </div>

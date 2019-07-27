@@ -51,7 +51,6 @@ class Window extends React.Component {
     if (update["PlayerTarget"] != null) {
       this.updateUIVisibility(update);
     }
-    console.log(update);
     this.setState(update);
   }
 
@@ -115,18 +114,11 @@ class Window extends React.Component {
           </div>
           <div className="Window-footer">
             <div className="btn-group">
-              <Button
-                variant="primary"
-                onClick={() => {
-                  Observer.notify("ActivateFeature", "Battle");
-                }}
-              >
-                Battle
-              </Button>
-              <Button variant="primary"
-                onClick={() => {
-                  Observer.notify("ActivateFeature", "Explore");
-                }}>Explore</Button>
+              <ActivateFeatureButton feature="Battle"></ActivateFeatureButton>
+              <ActivateFeatureButton feature="Explore"></ActivateFeatureButton>
+              <ActivateFeatureButton feature="Inventory"></ActivateFeatureButton>
+              <ActivateFeatureButton feature="Skills"></ActivateFeatureButton>
+              <ActivateFeatureButton feature="Boss" disabled={true}></ActivateFeatureButton>
             </div>
             <Log />
           </div>
@@ -134,6 +126,18 @@ class Window extends React.Component {
       </div>
     );
   }
+}
+
+function ActivateFeatureButton(props){
+  return (<Button
+    variant="primary"
+    disabled={props.disabled}
+    onClick={() => {
+      Observer.notify("ActivateFeature", props.feature);
+    }}>
+    {props.feature}
+  </Button>
+  )
 }
 
 export default Window;

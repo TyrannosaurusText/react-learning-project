@@ -13,17 +13,17 @@ export function tupleWord(count) {
       return count + "-tuple ";
   }
 }
-export let newJobReincarnator = new Stats({
+export let newPlayer = new Stats({
   name: "Player",
-  hp: new constNumberContainer(100),
+  HP_base: new constNumberContainer(100),
   level: 1,
-  atk: new constNumberContainer(10),
-  def: new constNumberContainer(10),
-  SP: new constNumberContainer(100),
-  MP: new constNumberContainer(50),
+  atk_base: new constNumberContainer(10),
+  def_base: new constNumberContainer(10),
+  SP_base: new constNumberContainer(100),
+  MP_base: new constNumberContainer(50),
   EXP: new constNumberContainer(0),
-  turns: new constNumberContainer(1),
-  skillLevels: {Strike:1, "Flame Strike":20, "ATK Up":1, "ATK Down":1, "Firebolt":1, "Regen":1 },
+  turns_base: new constNumberContainer(1),
+  skillLevels: {"Strike":1, "Flame Strike":20, "ATK Up":1, "ATK Down":1, "Firebolt":1, "Regen":1 },
   isPlayer: true
 });
 

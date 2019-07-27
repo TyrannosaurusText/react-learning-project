@@ -9,7 +9,7 @@ let MonsterList = {
     name: "Enemy",
     minLevel: 1,
     maxLevel: 100000,
-    hp: new constNumberContainer(100),
+    HP: new constNumberContainer(100),
     atk: new constNumberContainer(10),
     def: new constNumberContainer(0),
     hpScale: new constNumberContainer(0.1),
@@ -28,7 +28,7 @@ let MonsterList = {
         Strike: Clamp(Math.floor(level / 10), 1, 10000),
         "Full Charge": 1,
         Firebolt: Clamp(Math.floor(level / 10), 1, 10000),
-        "Flame Stike": Clamp(Math.floor(level / 10), 1, 10000)
+        "Flame Strike": Clamp(Math.floor(level / 10), 1, 10000)
       };
     }
   }
@@ -61,7 +61,7 @@ export function MonsterGeneration(name, level, min_rare, max_rare) {
     let r = getRndmInteger(min_rare, max_rare);
     let stats = new Stats({});
 
-    let hp = calc(mob.hpScale, mob.hp, level, mob.minLevel, r, mob.rarityScale);
+    let HP = calc(mob.hpScale, mob.HP, level, mob.minLevel, r, mob.rarityScale);
     let atk = calc(
       mob.atkScale,
       mob.atk,
@@ -81,7 +81,7 @@ export function MonsterGeneration(name, level, min_rare, max_rare) {
     if (mob.maxLevel !== -1) level = Math.max(level, mob.minLevel);
 
     let rarename = rarityNames[r];
-    stats.setMobStats(mob, level, rarename, hp, atk, def);
+    stats.setMobStats(mob, level, rarename, HP, atk, def);
     return stats;
   }
   return null;

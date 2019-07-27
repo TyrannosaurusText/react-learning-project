@@ -3,7 +3,6 @@ import { skillEnum } from "./SkillList";
 import Observer from "./Observer";
 import Message from "./Message";
 import Stats from "./Stats";
-import Player from "./Player";
 import { MonsterGeneration } from "./MonsterGeneration";
 import { getRndmInteger } from "./random";
 import { toEng, ObserverEnum } from "./globals";
@@ -198,7 +197,6 @@ class Battle {
     if (this.turn === "Player") {
       result = this.useSkill(skillName, player, enemies[target]);
     }
-    // console.log(result);
     let turns = player.getval("turns_now");
     if (result === true) {
       //skill was used
@@ -227,12 +225,9 @@ class Battle {
     let enemy = this.statusEnemies[enemyIndex];
     let target = this.statusParty[enemy.get("targetIndex")];
     //TODO: add change target index
-    // console.log(skillName);
-    // console.log(enemy.get("skillLevels"));
     let isValid = Object.keys(enemy.get("skillLevels")).includes(skillName);
     if (!isValid) {
-      console.log(enemy);
-      console.log(skillName);
+      console.log(enemy, skillName)
       console.error("enemy does not have skill");
       return;
     }
@@ -338,7 +333,7 @@ function getSpawnMessage(temp) {
       " " +
       temp.get("name") +
       " appeared. (" +
-      toEng(temp.getval("hp")) +
+      toEng(temp.getval("HP")) +
       ", " +
       toEng(temp.getval("atk")) +
       ", " +

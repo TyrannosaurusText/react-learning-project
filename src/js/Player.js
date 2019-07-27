@@ -17,5 +17,6 @@ class Player
         return this;
         
     }
+    
 }
 export default Player;
