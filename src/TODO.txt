@@ -1,13 +1,20 @@
+Battle:
 ability to change skills
 Seperate enemy generation & combat
 save and load system
 death and victories
 loot! and much more
 
-
 later goals:
 crit damage
 potions?
 replace statuseffect bar words with icons.
+
+
+inventory:
+items,
+click item to choose (equip/unequip)/upgrade
+doubleclick quick equip/quick upgrade
+
 
 lets not start ok.

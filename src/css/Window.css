@@ -17,6 +17,7 @@
   border-bottom: 1vh solid black;
   height: 850px;
   width: 1440px;
+  /* width: 1200px; */
   /* min-width: 500px; */
   /* min-height: 500px; */
 
@@ -38,7 +39,7 @@
 .pos{
   display:flex;  
   flex-shrink: 0;
-  width: 98%;
+  width: 99%;
   min-height: 240px;
   margin-left: 2px;
   margin-top: 2px;

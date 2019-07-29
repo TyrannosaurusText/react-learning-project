@@ -132,13 +132,13 @@ class Stats {
   calcStats() {
     let vals = ["HP", "atk", "def", "SP", "MP", "turns"];
     vals.forEach(element => {
-      console.log(element)
+      // console.log(element)
       this.set(
         element,
         new NumberContainer(0).plus(this.getval(element + "_base"))
         //add gear
       );
-      console.log(this.getval(element));
+      // console.log(this.getval(element));
     });
   }
   setBattleStats() {

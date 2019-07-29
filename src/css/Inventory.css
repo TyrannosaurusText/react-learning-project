@@ -1,0 +1,90 @@
+.inventory {
+  width: 83%;
+  height: 100%;
+  max-height: 400px;
+  align-items: left;
+  background-color: lightcyan;
+  border: 1px solid black;
+  display: flex;
+}
+.inventory-window,
+.equipment-window,
+.selection-window {
+  margin: 5px;
+  margin-right: 0px;
+  display: inline-block;
+  padding-right: 10px;
+}
+.equipment-window {
+  border: 2px solid black;
+}
+.inventory-page,
+.equipment-page,
+.selection-page {
+  display: inline-block;
+  border: 1px solid black;
+  /* width:0; */
+}
+.inventory-page {
+  width: 912px;
+}
+.equipment-page {
+  margin-left: 10px;
+  margin-top: 5px;
+  width: 212px;
+}
+.selection-page {
+  margin-left: 5px;
+  width: 212px;
+  height: 280px;
+  margin-top: 50px;
+}
+.box {
+  width: 70px;
+  height: 70px;
+  margin: auto;
+}
+.red:hover{
+    background-color: red;
+}
+.blue:hover{
+    background-color: blue;
+}
+.box-inner{
+
+  cursor: pointer;
+  width: 70px;
+  height: 70px;
+  background-repeat: no-repeat;
+  margin-left: -5px;
+  margin-top: -2px;
+  /* align-items: center; */
+}
+.text {
+  margin-left: 10px;
+}
+.inner-window {
+  background-color: lightblue;
+  border: 1px solid black;
+}
+.inventory-row {
+  display: flex;
+  padding-bottom: 0px;
+  padding-top: 0px;
+  margin: 0 0;
+  overflow: visible;
+}
+.inventoryslot {
+  margin: 0;
+}
+.inventory-li {
+  list-style-type: none;
+  float: left;
+  margin: auto;
+  /* margin-bottom */
+  padding: 0px;
+}
+.inventory-ul {
+  list-style-type: none;
+  padding: 0 0 0 0;
+}

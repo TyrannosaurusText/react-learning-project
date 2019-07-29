@@ -11,6 +11,7 @@ import Skills from "./js/Skills";
 import { readTextFile } from "./js/SkillList";
 import file from "./skills.csv";
 import Log from "./js/Log";
+import Inventory from "./js/Inventory";
 
 // import character from './Combat'
 // import './globals'
@@ -34,7 +35,7 @@ class Game extends React.Component {
     this.Log = new Log();//create log before battle
   
     this.player = new Player(stats);
-
+    this.inventory = new Inventory();
     this.battle = new Battle();
   }
 

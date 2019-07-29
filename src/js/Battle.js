@@ -8,26 +8,27 @@ import { getRndmInteger } from "./random";
 import { toEng, ObserverEnum } from "./globals";
 import EnemyPlayer from "./EnemyAI.js";
 import { NumberContainer } from "./numbers";
-
+import Feature from "./Feature";
 /**
  *
  */
-class Battle {
-  constructor(w) {
+class Battle extends Feature {
+  constructor() {
+    super();
+    if(Battle.instance) return Battle.instance;
+    Battle.instance = this;
     this.EnemyAI = null;
     this.statusParty = {};
     this.statusEnemies = {};
     this.playerAlive = false;
     this.enemyAlive = false;
     this.playerturn = true;
-    this.Wind = w;
-    this.featureActive = false;
     this.respawnTime = 3000;
-    this.update = {};
     this.turn = -1;
     this.battleEnded = true;
 
     Observer.subscribe("ActivateFeature", "Battle", val => {
+      console.log(val)
       if (val === "Battle") {
         this.featureActive = true;
         if (this.battleEnded) {
@@ -49,7 +50,7 @@ class Battle {
       this.add("Party", this.statusParty);
       this.add("Enemies", this.statusEnemies);
       this.add("PlayerTarget", this.statusParty[0].getval("targetIndex"));
-      this.add("Battle", true);
+      // this.add("WindowMode", "Battle");
       this.sendUpdate();
     });
     Observer.subscribe("BattlePlayerDefeated", "Battle", () => {
@@ -102,15 +103,9 @@ class Battle {
     if (Object.keys(this.statusEnemies).length) {
       return Object.keys(this.statusEnemies)[0];
     }
+    return -1;
   }
 
-  sendUpdate() {
-    Observer.notify("BattleStateChange", this.update);
-    this.update = {};
-  }
-  add(key, val) {
-    this.update[key] = val;
-  }
   getState() {
     return this.featureActive;
   }
@@ -150,23 +145,21 @@ class Battle {
       this.add("Party", this.statusParty);
       this.add("Enemies", this.statusEnemies);
       this.add("PlayerTarget", statusPlayer.getval("targetIndex"));
-      this.add("Battle", true);
+      // this.add("WindowMode", "Battle");
       this.add("turn", this.turn);
 
       this.EnemyAI = new EnemyPlayer(this.statusEnemies);
       this.sendUpdate();
-      
     });
     Observer.notify("getPlayerStats", null);
   }
   continue() {
     this.featureActive = true;
-    this.add("Battle", true);
+    // this.add("WindowMode", "Battle");
     this.sendUpdate();
   }
   stop() {
     this.featureActive = false;
-    this.add("Battle", false);
     this.sendUpdate();
   }
 
@@ -227,7 +220,7 @@ class Battle {
     //TODO: add change target index
     let isValid = Object.keys(enemy.get("skillLevels")).includes(skillName);
     if (!isValid) {
-      console.log(enemy, skillName)
+      console.log(enemy, skillName);
       console.error("enemy does not have skill");
       return;
     }

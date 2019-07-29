@@ -7,8 +7,9 @@ import Button from "react-bootstrap/Button";
 import { toEng } from "./globals";
 import Observer from "./Observer";
 import Skills from "./Skills";
-import { OverlayTrigger } from "react-bootstrap";
-import { Tooltip } from "react-bootstrap";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Tooltip from "react-bootstrap/Tooltip";
+import UIState from "./UIState";
 // import Stats from "./Stats";
 
 export function BattleInfoWindow(props) {
@@ -65,28 +66,125 @@ function SkillButtons(props) {
           </Tooltip>
         }
       >
-        <SkillButton variant={variant} value={props.value} onCD={props.onCD} onClick={()=>{props.onClick()}}></SkillButton>
+        <SkillButton
+          variant={variant}
+          value={props.value}
+          onCD={props.onCD}
+          onClick={() => {
+            props.onClick();
+          }}
+        />
       </OverlayTrigger>
     );
   } else
     return (
-      <SkillButton variant={variant} value={props.value} disabled={true} onClick={()=>{}}></SkillButton>
+      <SkillButton
+        variant={variant}
+        value={props.value}
+        disabled={true}
+        onClick={() => {}}
+      />
     );
 }
-function SkillButton(props){
-  return (<Button
-    className="ml-1 mt-1 btn-block skillbutton"
-    variant={props.variant}
-    disabled={props.disabled} //dont disable b/c bug
-    onClick={() => {
-      props.onClick();
-    }}
-  >
-    {props.value + (props.onCD ? " (" + props.onCD + ")" : "")}
-  </Button>);
+function SkillButton(props) {
+  return (
+    <Button
+      className="ml-1 mt-1 btn-block skillbutton"
+      variant={props.variant}
+      disabled={props.disabled} //dont disable b/c bug
+      onClick={() => {
+        props.onClick();
+      }}
+    >
+      {props.value + (props.onCD ? " (" + props.onCD + ")" : "")}
+    </Button>
+  );
 }
 
-export class BattlePlayerUI extends React.Component {
+export class BattleFunc extends UIState {
+  constructor(props) {
+    super(props);
+    // this._isMounted = false;
+    this.state = {
+      PlayerTarget: 0,
+      Enemies: {},
+      Party: {},
+      enemyUIVisibility: null,
+      turn: "Player",
+
+      // WindowMode: null
+    };
+    Observer.subscribe("BattleStateChange", "Window", update => {
+      this.notifyStateChange(update);
+    });
+  }
+
+  componentDidMount() {
+    if(!this.props.hidden){
+      Observer.notify("BattleSendInfo", null);
+    }
+  }
+
+  updateUIVisibility(newState) {
+    let vis = this.state.enemyUIVisibility;
+    let PlayerTarget = this.state.PlayerTarget;
+    let Enemies = this.state.Enemies;
+    if (newState["Enemies"] != null) Enemies = newState.Enemies;
+    if (newState["PlayerTarget"] != null) PlayerTarget = newState.PlayerTarget;
+    vis = {};
+    for (var i = 0; i < 5; i++) {
+      if (i !== parseInt(PlayerTarget) && Enemies[i] != null) {
+        vis[i] = Enemies[i];
+      }
+    }
+
+    newState["enemyUIVisibility"] = vis;
+  }
+  notifyStateChange(update) {
+    Object.keys(update).forEach(element => {
+      if (this.state[element] == null) {
+        console.error(element + "is not a valid key!");
+        return;
+      }
+    });
+    if (update["PlayerTarget"] != null) {
+      this.updateUIVisibility(update);
+    }
+    this.setState(update);
+  }
+  render() {
+
+    if(this.props.hidden) return <div></div>
+    console.log(this.state.Enemies);
+    console.log(this.state.PlayerTarget)
+    let target = this.state.Enemies[this.state.PlayerTarget]
+    return (
+      <div>
+        <div className="pos">
+          <BattleInfoWindow turn={this.state.turn} />
+          <div className="team0">
+            <BattlePlayerUI
+              // useSkill={i => this.state.useSkill(i)}
+              PlayerStats={this.state.Party[0]}
+            />
+          </div>
+          <div className="team1">
+            {this.state.Enemies ? (
+              <BattleEnemyUI
+                statusSheet={target}
+                enemyUIVisibility={this.state.enemyUIVisibility}
+              />
+            ) : null}
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+export class BattlePlayerUI extends UIState {
+  useSkill(skillName) {
+    Observer.notify("BattlePlayerUseSkill", skillName);
+  }
   addButton(i) {
     const statusSheet = this.props.PlayerStats;
     const equippedSkills = statusSheet.getval("equippedSkills");
@@ -102,14 +200,16 @@ export class BattlePlayerUI extends React.Component {
           onCD={cd}
           level={statusSheet.getSkillLevel(skillName)}
           onClick={() => {
-            this.props.useSkill(skillName);
+            this.useSkill(skillName);
           }}
         />
       </div>
     );
   }
+
   render() {
     const statusSheet = this.props.PlayerStats;
+    console.log(statusSheet);
     if (statusSheet)
       return (
         <Container>
@@ -160,7 +260,6 @@ export class BattlePlayerUI extends React.Component {
                       {this.addButton(11)}
                     </div>
                   </div>
-                 
                 </div>
               </div>
             </Col>
@@ -178,60 +277,58 @@ export class BattleEnemyUI extends React.Component {
     const statusSheet = this.props.statusSheet;
     const enemyUIVisibility = this.props.enemyUIVisibility;
 
-    if (statusSheet)
-      return (
-        <Container>
-          <NameHPWindow statusSheet={statusSheet} />
-          <StatusWindow statusSheet={statusSheet} />
-          <LevelATKDEFWindow statusSheet={statusSheet} />
-          <Row className="window-border">
-            <Col className="bar">
-              <Charge
-                charge_now={statusSheet.getval("charge_now")}
-                charge_max={statusSheet.getval("charge_max")}
-              />
+    return (
+      <Container>
+        <NameHPWindow statusSheet={statusSheet} />
+        <StatusWindow statusSheet={statusSheet} />
+        <LevelATKDEFWindow statusSheet={statusSheet} />
+        <Row className="window-border">
+          <Col className="bar">
+            <Charge
+              charge_now={statusSheet.getval("charge_now")}
+              charge_max={statusSheet.getval("charge_max")}
+            />
+          </Col>
+          <Col>
+            <div />
+          </Col>
+          <Col>
+            <div />
+          </Col>
+        </Row>
+        <Row>
+          {enemyUIVisibility ? (
+            <Col className="mini-enemy-box">
+              {enemyUIVisibility[0] ? (
+                miniEnemyDisplay(enemyUIVisibility[0])
+              ) : (
+                <div />
+              )}
+              {enemyUIVisibility[1] ? (
+                miniEnemyDisplay(enemyUIVisibility[1])
+              ) : (
+                <div />
+              )}
+              {enemyUIVisibility[2] ? (
+                miniEnemyDisplay(enemyUIVisibility[2])
+              ) : (
+                <div />
+              )}
+              {enemyUIVisibility[3] ? (
+                miniEnemyDisplay(enemyUIVisibility[3])
+              ) : (
+                <div />
+              )}
+              {enemyUIVisibility[4] ? (
+                miniEnemyDisplay(enemyUIVisibility[4])
+              ) : (
+                <div />
+              )}
             </Col>
-            <Col>
-              <div />
-            </Col>
-            <Col>
-              <div />
-            </Col>
-          </Row>
-          <Row>
-            {enemyUIVisibility ? (
-              <Col className="mini-enemy-box">
-                {enemyUIVisibility[0] ? (
-                  miniEnemyDisplay(enemyUIVisibility[0])
-                ) : (
-                  <div />
-                )}
-                {enemyUIVisibility[1] ? (
-                  miniEnemyDisplay(enemyUIVisibility[1])
-                ) : (
-                  <div />
-                )}
-                {enemyUIVisibility[2] ? (
-                  miniEnemyDisplay(enemyUIVisibility[2])
-                ) : (
-                  <div />
-                )}
-                {enemyUIVisibility[3] ? (
-                  miniEnemyDisplay(enemyUIVisibility[3])
-                ) : (
-                  <div />
-                )}
-                {enemyUIVisibility[4] ? (
-                  miniEnemyDisplay(enemyUIVisibility[4])
-                ) : (
-                  <div />
-                )}
-              </Col>
-            ) : null}
-          </Row>
-        </Container>
-      );
-    else return null;
+          ) : null}
+        </Row>
+      </Container>
+    );
   }
 }
 function miniEnemyDisplay(props) {
@@ -402,4 +499,4 @@ function Charge(props) {
   );
 }
 
-export default { BattlePlayerUI, BattleEnemyUI };
+export default { BattleFunc };
