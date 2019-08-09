@@ -21,20 +21,23 @@ export default class PopoverStickOnHover extends React.Component {
     this.handleMouseEnter = this.handleMouseEnter.bind(this);
     this.handleMouseLeave = this.handleMouseLeave.bind(this);
     this.handleOnFocus = this.handleOnFocus.bind(this);
+    this.setRef = this.setRef.bind(this);
     this.handleOnBlur = this.handleOnBlur.bind(this);
     this.ref = null;
-    this.setref = element => {this.ref = element};
-
     this.state = {
       showPopover: false
     };
   }
 
-  focusOn()
-  {
-    console.log(this.ref)
-    if (this.ref)
-    this.ref.focus()
+  setRef(ref) {
+    // console.log("ref", ref);
+    this.ref = ref;
+    // return this.ref;
+  }
+
+  focusOn() {
+    // console.log(this.ref);
+    if (this.ref) this.ref.focus();
   }
 
   handleMouseEnter() {
@@ -75,7 +78,7 @@ export default class PopoverStickOnHover extends React.Component {
     clearTimeout(this.setTimeoutConst);
     this.setState({ lock: false }, () => {
       setTimeout(() => {
-        console.log(this.state.lock);
+        // console.log(this.state.lock);
 
         if (!this.state.lock) {
           this.setState({ showPopover: false });
@@ -102,7 +105,6 @@ export default class PopoverStickOnHover extends React.Component {
         }
       })
     )[0];
-
     return (
       <React.Fragment>
         {child}
@@ -121,31 +123,29 @@ export default class PopoverStickOnHover extends React.Component {
             show: _show,
             ...props
           }) => (
-            <div
-              inputref={el => this.ref = el}
+            <StatefulToolTip
+              setRef={this.setRef}
               {...props}
               style={{
                 ...props.style
               }}
               className="inv-tooltip"
               onMouseEnter={() => {
+                // console.log("Enter")
                 this.setState({ showPopover: true });
               }}
               onMouseLeave={this.handleMouseLeave}
-              onClick={()=>{this.focusOn()}}
-              onFocus={() => {
-                console.log("focus");
-                this.setState({ showPopover: true, lock: true });
+              onClick={() => {
+                // console.log("hi")
+                this.focusOn();
               }}
-              onBlur={() => {
-                console.log("blur");
-                this.setState({ lock: false, showPopover: false });
-              }}
+              onFocus={this.handleOnFocus}
+              onBlur={this.handleOnBlur}
               id="popover"
               // tabIndex={1}
             >
               {component}
-            </div>
+            </StatefulToolTip>
           )}
         </Overlay>
       </React.Fragment>
@@ -164,3 +164,26 @@ PopoverStickOnHover.propTypes = {
   component: PropTypes.node.isRequired
 };
 
+class StatefulToolTip extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    // console.log(this.props)
+    return (
+      <div
+        tabIndex={-1}
+        ref={this.props.setRef}
+        className={this.props.className}
+        style={this.props.style}
+        onClick={this.props.onClick}
+        onFocus={this.props.onFocus}
+        onBlur={this.props.onBlur}
+        onMouseEnter={this.props.onMouseEnter}
+        onMouseLeave={this.props.onMouseLeave}
+      >
+        {this.props.children}
+      </div>
+    );
+  }
+}
