@@ -8,8 +8,8 @@ import Player from "./js/Player";
 import { newPlayer } from "./js/globals";
 // import Stats from "./js/Stats"
 import Skills from "./js/Skills";
-import { readTextFile } from "./js/SkillList";
-import file from "./skills.csv";
+import { loadSkills } from "./js/SkillList";
+
 import Log from "./js/Log";
 import Inventory from "./js/Inventory";
 
@@ -32,8 +32,8 @@ class Game extends React.Component {
       "Regen"
     );
     stats.set("equippedSkills", skills);
-    this.Log = new Log();//create log before battle
-  
+    this.Log = new Log(); //create log before battle
+
     this.player = new Player(stats);
     this.inventory = new Inventory();
     this.battle = new Battle();
@@ -45,7 +45,6 @@ class Game extends React.Component {
     return <Window />;
   }
 }
-
-readTextFile(file, () => {
+loadSkills.then(() => {
   ReactDOM.render(<Game />, document.getElementById("root"));
 });

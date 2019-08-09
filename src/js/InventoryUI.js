@@ -5,8 +5,11 @@ import Button from "react-bootstrap/Button";
 import UIState from "./UIState";
 import circle from "../circle.png";
 import crossX from "../crossX.png";
-// import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+// import OverlayTrigger from "../x/OverlayTrigger";
+import PopoverStickOnHover from "../x/PopoverStickOnHover"
+import { ButtonGroup } from "react-bootstrap";
 // import Tooltip from "react-bootstrap/Tooltip";
+
 class InventoryUI extends UIState {
   constructor(props) {
     super(props);
@@ -140,36 +143,58 @@ function InventoryRow(numSlots, val, inv) {
 function inventorySlot(numSlots, i, item) {
   let name = "";
   let src = circle;
+  let trigger = ["hover", "focus"];
   if (numSlots > i) {
-    name = "blue";
+    name = "blue-on-hover";
   } else {
-    name = "red";
+    name = "red-on-hover";
     src = crossX;
   }
   if (item != null) {
     src = item.icon;
   }
   name += " box-inner";
+  function Overlay() {
+    return (
+      <PopoverStickOnHover
+        trigger={trigger}
+        placement="right"
+        arrowProps={{ fontSize: "10px" }}
+        component={
+          <div
+            className="inv-tooltip-inner"
+          >
+          <ButtonGroup>
+          <Button>Click Me</Button>
+          </ButtonGroup>
+          <div>{item.name}</div>
+          <div>{item.type}</div>
+          <div>{item.stack}</div>
+          <div>{item.stats}</div>
+          </div>
+        }
+      >
+        {Image()}
+      </PopoverStickOnHover>
+    );
+  }
+  function Image() {
+    return (
+      <img
+        tabIndex="0"
+        onClick={() => {
+          console.log(i);
+        }}
+        onMouseDown={onmousedown}
+        className={name}
+        src={src}
+        alt=""
+      />
+    );
+  }
   return (
     <div className="inventoryslot">
-      <div className="inner-window box">
-        {/* <OverlayTrigger
-          trigger="hover"
-          placement="bottom"
-          arrowProps={{ fontSize: "10px" }}
-          overlay={<Tooltip className="my-tooltip">{"hi"}</Tooltip>
-          }> */}
-          <img
-            onClick={() => {
-              console.log(i);
-            }}
-            onMouseDown={onmousedown}
-            className={name}
-            src={src}
-            alt=""
-          />
-        {/* </OverlayTrigger> */}
-      </div>
+      <div className="inner-window box">{item ? Overlay() : Image()}</div>
     </div>
   );
 }

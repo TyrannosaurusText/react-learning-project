@@ -18,7 +18,10 @@ class Inventory extends Feature {
       this.freeIndex.push(i);
     }
     this.addItem(0);
-    console.log(this.InventoryObject);
+    this.addItem(0);
+    this.addItem(0);
+    this.addItem(0);
+    // console.log(this.InventoryObject);
 
     Observer.subscribe("ActivateFeature", "Inventory", featureName => {
       if (featureName === "Inventory") {
@@ -46,14 +49,15 @@ class Inventory extends Feature {
     return this.freeIndex.splice(bsIndex, 0, index);
   }
   addItem(itemID) {
-    if (this.getEmpty()) {
+
+    if (this.getEmpty() == null) {
       return false;
     }
     let item = ItemList.getItem(itemID);
     if (!item) {
       return false;
     }
-    this.InventoryObject[this.getEmpty()] = item;
+    this.InventoryObject[this.popFreeIndex()] = item;
     this.add("content", this.InventoryObject);
     this.sendUpdate();
   }

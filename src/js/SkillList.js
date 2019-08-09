@@ -2,6 +2,7 @@ import { getRndmInteger } from "./random";
 import { tupleWord } from "./globals";
 import { NumberContainer } from "./numbers";
 import { Buff, Debuff, DoT, Regen } from "./Buff";
+import file from "../skills.csv";
 import Papa from "papaparse";
 // import Observer from "./Observer";
 
@@ -158,15 +159,21 @@ export let SkillList = {
       return returnObj;
     }
   },
-  "Regen":{
+  Regen: {
     desc: skillLevel => {
-      return "Regenerate " + (50 +10* skillLevel) + " health every turn.";
+      return "Regenerate " + (50 + 10 * skillLevel) + " health every turn.";
     },
     onUse: (skillLevel = 1) => {
       let buff = statusEffect(
-        new Regen(skillEnum.Regen, 20, {
-          HP: 50 + 10 * skillLevel
-        }, "regenerated",false)
+        new Regen(
+          skillEnum.Regen,
+          20,
+          {
+            HP: 50 + 10 * skillLevel
+          },
+          "regenerated",
+          false
+        )
       );
       // return obj;
       let returnObj = returnObjectAppend({}, "self", "buff", buff);
@@ -236,51 +243,54 @@ function addSkill(
   new_skill.can_crit = can_crit;
   new_skill.critrate = critrate;
   new_skill.restriction = restriction;
-
 }
 
-export function readTextFile(file, callback) {
-  var rawFile = new XMLHttpRequest();
-  rawFile.open("GET", file, true);
-  rawFile.onreadystatechange = function() {
-    if (rawFile.readyState === 4) {
-      if (rawFile.status === 200 || rawFile.status === 0) {
-        var allText = rawFile.responseText;
+export const loadSkills = new Promise(function(resolve, reject) {
+  try {
+    var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", file, true);
+    rawFile.onreadystatechange = function() {
+      if (rawFile.readyState === 4) {
+        if (rawFile.status === 200 || rawFile.status === 0) {
+          var allText = rawFile.responseText;
 
-        Papa.parse(allText, {
-          header: true,
-          worker: true,
-          dynamicTyping: true,
-          skipEmptyLines: "greedy",
-          complete: data => {
-            let keys = Object.keys(data.data);
-            for (var i = 0; i < data.data.length; i++) {
-              let obj = data.data[keys[i]];
-              addSkill(
-                obj.name,
-                obj.type,
-                obj.distance,
-                obj.element,
-                obj.SP_Cost,
-                obj.MP_Cost,
-                obj.upgrade_type,
-                obj.upgrade_cost_mult,
-                obj.target,
-                obj.duration,
-                obj.cooldown,
-                obj.can_crit,
-                obj.critrate,
-                obj.restriction
-              );
-              // });
+          Papa.parse(allText, {
+            header: true,
+            worker: true,
+            dynamicTyping: true,
+            skipEmptyLines: "greedy",
+            complete: data => {
+              let keys = Object.keys(data.data);
+              for (var i = 0; i < data.data.length; i++) {
+                let obj = data.data[keys[i]];
+                addSkill(
+                  obj.name,
+                  obj.type,
+                  obj.distance,
+                  obj.element,
+                  obj.SP_Cost,
+                  obj.MP_Cost,
+                  obj.upgrade_type,
+                  obj.upgrade_cost_mult,
+                  obj.target,
+                  obj.duration,
+                  obj.cooldown,
+                  obj.can_crit,
+                  obj.critrate,
+                  obj.restriction
+                );
+                // });
+              }
             }
-            callback()
-          }
-        });
+          });
+          resolve("success");
+        }
       }
-    }
-  };
-  rawFile.send(null);
-}
+    };
+    rawFile.send(null);
+  } catch (error) {
+    reject(error);
+  }
+});
 
-export default { SkillList, readTextFile };
+export default { SkillList, loadSkills };

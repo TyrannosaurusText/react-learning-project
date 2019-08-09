@@ -39,23 +39,26 @@ function SkillButtons(props) {
     Dark: "Dark",
     Earth: "Success"
   };
+  let disabled = props.onCD?true:false;
   let variant = "secondary";
   if (skill) variant = color[skill.element];
   if (props.value !== "None") {
     let cost_str = null;
     let desc = skill.desc(props.level);
-    if (skill.MP_Cost || skill.SP_Cost)
+    if (skill.MP_Cost || skill.SP_Cost) {
       cost_str = (
         <div>
           Costs: {skill.SP_Cost ? skill.SP_Cost + " SP" : ""}{" "}
           {skill.MP_Cost ? skill.MP_Cost + "% MP" : ""}
         </div>
       );
+    }
     return (
       <OverlayTrigger
         trigger="hover"
+        rootClose={true}
         placement="bottom"
-        arrowProps={{ fontSize: "10px" }}
+        // arrowProps={{ fontSize: "10px" }}
         overlay={
           <Tooltip className="my-tooltip">
             {props.value + " lvl " + props.level}
@@ -63,17 +66,19 @@ function SkillButtons(props) {
             {skill.distance ? <div>{skill.distance}</div> : ""}
             {cost_str ? <div>{cost_str}</div> : ""}
             {desc}
+            
           </Tooltip>
         }
       >
-        <SkillButton
-          variant={variant}
-          value={props.value}
-          onCD={props.onCD}
-          onClick={() => {
+        {SkillButton({
+          onCD: props.onCD,
+          value: props.value,
+          variant: variant,
+          disabled: disabled,
+          onClick: () => {
             props.onClick();
-          }}
-        />
+          }
+        })}
       </OverlayTrigger>
     );
   } else
@@ -110,7 +115,7 @@ export class BattleFunc extends UIState {
       Enemies: {},
       Party: {},
       enemyUIVisibility: null,
-      turn: "Player",
+      turn: "Player"
 
       // WindowMode: null
     };
@@ -120,7 +125,7 @@ export class BattleFunc extends UIState {
   }
 
   componentDidMount() {
-    if(!this.props.hidden){
+    if (!this.props.hidden) {
       Observer.notify("BattleSendInfo", null);
     }
   }
@@ -153,11 +158,8 @@ export class BattleFunc extends UIState {
     this.setState(update);
   }
   render() {
-
-    if(this.props.hidden) return <div></div>
-    console.log(this.state.Enemies);
-    console.log(this.state.PlayerTarget)
-    let target = this.state.Enemies[this.state.PlayerTarget]
+    if (this.props.hidden) return <div />;
+    let target = this.state.Enemies[this.state.PlayerTarget];
     return (
       <div>
         <div className="pos">
@@ -209,7 +211,6 @@ export class BattlePlayerUI extends UIState {
 
   render() {
     const statusSheet = this.props.PlayerStats;
-    console.log(statusSheet);
     if (statusSheet)
       return (
         <Container>

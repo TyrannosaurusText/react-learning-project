@@ -35,7 +35,7 @@
 }
 .selection-page {
   margin-left: 5px;
-  width: 212px;
+  width: 102px;
   height: 280px;
   margin-top: 50px;
 }
@@ -44,14 +44,13 @@
   height: 70px;
   margin: auto;
 }
-.red:hover{
-    background-color: red;
+.red-on-hover:hover {
+  background-color: red;
 }
-.blue:hover{
-    background-color: blue;
+.blue-on-hover:hover {
+  background-color: blue;
 }
-.box-inner{
-
+.box-inner {
   cursor: pointer;
   width: 70px;
   height: 70px;
@@ -87,4 +86,20 @@
 .inventory-ul {
   list-style-type: none;
   padding: 0 0 0 0;
+}
+
+.inv-tooltip-inner {
+  /* background-color: black; */
+  color: white;
+  font-size: 15px;
+  text-align: left;
+
+  padding: '2px 10px';
+}
+.inv-tooltip{
+  width: 100px;
+  height: 180px;  
+  background-color: rgba(0, 0, 0, .7);
+  padding: "2px 10px";
+  border-radius: 5%;
 }
