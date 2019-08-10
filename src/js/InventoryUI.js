@@ -6,7 +6,7 @@ import UIState from "./UIState";
 import circle from "../circle.png";
 import crossX from "../crossX.png";
 // import OverlayTrigger from "../x/OverlayTrigger";
-import PopoverStickOnHover from "../x/PopoverStickOnHover"
+import StickyPopover from "../x/StickyPopover"
 import { ButtonGroup } from "react-bootstrap";
 // import Tooltip from "react-bootstrap/Tooltip";
 
@@ -156,10 +156,11 @@ function inventorySlot(numSlots, i, item) {
   name += " box-inner";
   function Overlay() {
     return (
-      <PopoverStickOnHover
+      <StickyPopover
         trigger={trigger}
         placement="right"
         arrowProps={{ fontSize: "10px" }}
+        className="inv-tooltip"
         component={
           <div
             className="inv-tooltip-inner"
@@ -175,7 +176,7 @@ function inventorySlot(numSlots, i, item) {
         }
       >
         {Image()}
-      </PopoverStickOnHover>
+      </StickyPopover>
     );
   }
   function Image() {
