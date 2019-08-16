@@ -58,13 +58,14 @@ export const ObserverEnum = {
 export function binarySearch(arr, value) {
   let lo = 0;
   let hi = arr.length;
-  let mid;
+  let mid = lo;
   while (lo < hi) {
     mid = Math.trunc((lo + hi) / 2);
     if (arr[mid] === value) return mid;
     if (arr[mid] > value) hi = mid;
     else if (arr[mid] < value) lo = mid + 1;
   }
+  if(arr[mid] < value) mid+=1;
   return mid;
 }
 export default { tupleWord };

@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Overlay } from "react-bootstrap";
+import { Overlay, Fade } from "react-bootstrap";
+// var Fade = (require("Fade"));
 
 export default class StickyPopover extends React.Component {
   constructor(props) {
@@ -28,24 +29,24 @@ export default class StickyPopover extends React.Component {
   handleMouseEnter() {
     const { delay, onMouseEnter } = this.props;
 
-    this.setTimeoutConst = setTimeout(() => {
+    // this.setTimeoutConst = setTimeout(() => {
       this.setState({ showPopover: true }, () => {
         if (onMouseEnter) {
           onMouseEnter();
-        }
-      });
-    }, delay);
+        }});
+      // });
+    // }, delay);
   }
 
   handleMouseLeave() {
-    clearTimeout(this.setTimeoutConst);
+    // clearTimeout(this.setTimeoutConst);
     if (!this.state.lock) this.setState({ showPopover: false });
   }
 
   componentWillUnmount() {
-    if (this.setTimeoutConst) {
-      clearTimeout(this.setTimeoutConst);
-    }
+    // if (this.setTimeoutConst) {
+    //   clearTimeout(this.setTimeoutConst);
+    // }
   }
 
   handleOnFocus() {
@@ -60,7 +61,7 @@ export default class StickyPopover extends React.Component {
     }, delay);
   }
   handleOnBlur() {
-    clearTimeout(this.setTimeoutConst);
+    // clearTimeout(this.setTimeoutConst);
     this.setState({ lock: false }, () => {
       setTimeout(() => {
         if (!this.state.lock) {
@@ -75,6 +76,7 @@ export default class StickyPopover extends React.Component {
 
     const child = React.Children.map(children, child =>
       React.cloneElement(child, {
+        transition: Fade.default,
         onMouseEnter: this.handleMouseEnter,
         onMouseLeave: this.handleMouseLeave,
         onFocus: this.handleOnFocus,
@@ -118,7 +120,7 @@ export default class StickyPopover extends React.Component {
               }}
               onMouseLeave={this.handleMouseLeave}
               onClick={() => {
-                this.focusOn();
+                this.setState({ lock: false,showPopover: false });
               }}
               onFocus={this.handleOnFocus}
               onBlur={this.handleOnBlur}

@@ -28,7 +28,7 @@ class Battle extends Feature {
     this.battleEnded = true;
 
     Observer.subscribe("ActivateFeature", "Battle", val => {
-      console.log(val)
+      // console.log(val)
       if (val === "Battle") {
         this.featureActive = true;
         if (this.battleEnded) {

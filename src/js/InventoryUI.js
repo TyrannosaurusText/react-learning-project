@@ -6,7 +6,7 @@ import UIState from "./UIState";
 import circle from "../circle.png";
 import crossX from "../crossX.png";
 // import OverlayTrigger from "../x/OverlayTrigger";
-import StickyPopover from "../x/StickyPopover"
+import StickyPopover from "../x/StickyPopover";
 import { ButtonGroup } from "react-bootstrap";
 // import Tooltip from "react-bootstrap/Tooltip";
 
@@ -15,9 +15,10 @@ class InventoryUI extends UIState {
     super(props);
     this.state = {
       content: {},
+      equips: {},
       numEquipSlots: 3,
       maxEquipSlots: 12,
-      numSlots: 100,
+      numSlots: 200,
       maxSlots: 65 * 36,
       page: 1
     };
@@ -38,7 +39,10 @@ class InventoryUI extends UIState {
         <div className="inventory">
           <div className="equipment-window">
             <div className="text inner-window">Equipment</div>
-            <EquipmentPage slots={this.state.numEquipSlots} />
+            <EquipmentPage
+              inv={this.state.equips}
+              slots={this.state.numEquipSlots}
+            />
           </div>
           {/* <div className="selection-window">
             <div className="selection-page" />
@@ -90,24 +94,25 @@ function InventoryPageButton(props) {
   return <div className="btn-group">{rows}</div>;
 }
 
-function EquipmentPage(props) {
+function EquipmentPage(props, inv) {
   return (
     <div>
       <div className="equipment-page">
-        {EquipmentRow(props.slots, 0)}
-        {EquipmentRow(props.slots, 1)}
-        {EquipmentRow(props.slots, 2)}
-        {EquipmentRow(props.slots, 3)}
+        {EquipmentRow(props.slots, 0, props.inv)}
+        {EquipmentRow(props.slots, 1, props.inv)}
+        {EquipmentRow(props.slots, 2, props.inv)}
+        {EquipmentRow(props.slots, 3, props.inv)}
       </div>
     </div>
   );
 }
-function EquipmentRow(slots, index) {
+function EquipmentRow(slots, index, inv) {
+  let slotType = "Equipment";
   return (
     <div className="inventory-row">
-      {inventorySlot(slots, index * 3)}
-      {inventorySlot(slots, index * 3 + 1)}
-      {inventorySlot(slots, index * 3 + 2)}
+      {inventorySlot(slots, slotType, index * 3, inv[index * 3])}
+      {inventorySlot(slots, slotType, index * 3 + 1, inv[index * 3 + 1])}
+      {inventorySlot(slots, slotType, index * 3 + 2, inv[index * 3 + 2])}
     </div>
   );
   //   return val;
@@ -131,20 +136,22 @@ function InventoryRow(numSlots, val, inv) {
   for (var i = 0; i < 13; i++) {
     number[i] = val + i;
   }
+  let slotType = "Inventory";
   let list = number.map(i => (
     <li className="inventory-li" key={i}>
-      {inventorySlot(numSlots, i, inv[i])}
+      {inventorySlot(numSlots, slotType, i, inv[i])}
     </li>
   ));
 
   return <ul className="inventory-ul inventory-row">{list}</ul>;
   //   return val;
 }
-function inventorySlot(numSlots, i, item) {
+
+function inventorySlot(numSlots, slotType, index, item) {
   let name = "";
   let src = circle;
   let trigger = ["hover", "focus"];
-  if (numSlots > i) {
+  if (numSlots > index) {
     name = "blue-on-hover";
   } else {
     name = "red-on-hover";
@@ -154,7 +161,7 @@ function inventorySlot(numSlots, i, item) {
     src = item.icon;
   }
   name += " box-inner";
-  function Overlay() {
+  function EquipmentOverlay() {
     return (
       <StickyPopover
         trigger={trigger}
@@ -162,16 +169,23 @@ function inventorySlot(numSlots, i, item) {
         arrowProps={{ fontSize: "10px" }}
         className="inv-tooltip"
         component={
-          <div
-            className="inv-tooltip-inner"
-          >
-          <ButtonGroup>
-          <Button>Click Me</Button>
-          </ButtonGroup>
-          <div>{item.name}</div>
-          <div>{item.type}</div>
-          <div>{item.stack}</div>
-          <div>{item.stats}</div>
+          <div className="inv-tooltip-inner">
+            <ButtonGroup>
+              <Button
+                onClick={() => {
+                  Observer.notify("EquipItem", {
+                    itemPosition: index,
+                    Equip: slotType==="Equipment" ? 0 : 1
+                  });
+                }}
+              >
+                {slotType === "Equipment" ? "Unequip" : "Equip"}
+              </Button>
+            </ButtonGroup>
+            <div>{item.name}</div>
+            <div>{item.type}</div>
+            <div>{item.stack}</div>
+            <div>{item.stats}</div>
           </div>
         }
       >
@@ -183,8 +197,11 @@ function inventorySlot(numSlots, i, item) {
     return (
       <img
         tabIndex="0"
-        onClick={() => {
-          console.log(i);
+        onDoubleClick={() => {
+          Observer.notify("EquipItem", {
+            itemPosition: index,
+            Equip: slotType==="Equipment" ? 0 : 1
+          });
         }}
         onMouseDown={onmousedown}
         className={name}
@@ -195,7 +212,9 @@ function inventorySlot(numSlots, i, item) {
   }
   return (
     <div className="inventoryslot">
-      <div className="inner-window box">{item ? Overlay() : Image()}</div>
+      <div className="inner-window box">
+        {item ? EquipmentOverlay() : Image()}
+      </div>
     </div>
   );
 }
